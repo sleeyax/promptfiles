@@ -19,8 +19,12 @@ mkdir -p ~/.config/Code/User/prompts/
 # symlink all prompt files (flat structure)
 ln -s $(pwd)/prompts/* $(pwd)/agents/* ~/.config/Code/User/prompts/
 
+# symlink mcp.json
+ln -s $(pwd)/mcp.json ~/.config/Code/User/mcp.json
+
 # to uninstall (only removes symlinks pointing to this repo):
 # find ~/.config/Code/User/prompts/ -type l -lname "$(pwd)/*" -delete
+# rm ~/.config/Code/User/mcp.json
 ```
 
 ## Resources
