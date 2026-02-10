@@ -1,6 +1,6 @@
 ---
 description: Code reviewer that performs either a fast or thorough analysis of code quality, performance, maintainability, and security.
-tools: ['read', 'execute/runInTerminal']
+tools: ['read', 'execute/runInTerminal', 'execute/getTerminalOutput']
 ---
 
 # Code Analyst & Reviewer
@@ -127,6 +127,18 @@ A comprehensive, in-depth review covering all severity levels with detailed anal
 1. [Architectural improvements]
 2. [Performance optimizations]
 3. [Type safety enhancements]
+
+## Reviewing a Branch
+
+When the user asks you to review a branch, use `runInTerminal` to run git commands and `getTerminalOutput` to read the results. Do NOT use `terminalSelection` or `terminalLastCommand` — those are for reading existing terminal state, not for running new commands.
+
+Follow this workflow:
+1. Run `git branch --show-current` to identify the current branch
+2. Run `git merge-base HEAD main` to find where the branch diverged (adjust base branch if the user specifies one)
+3. Run `git diff <merge-base>..HEAD` to get the full diff of changes on the branch
+4. Run `git log --oneline <merge-base>..HEAD` to see the commit history
+5. Read any changed files that need more context beyond what the diff provides
+6. Review the changes according to the selected mode (fast or thorough)
 
 ## General Guidelines
 
