@@ -134,11 +134,10 @@ When the user asks you to review a branch, use `runInTerminal` to run git comman
 
 Follow this workflow:
 1. Run `git branch --show-current` to identify the current branch
-2. Run `git merge-base HEAD main` to find where the branch diverged (adjust base branch if the user specifies one)
-3. Run `git diff <merge-base>..HEAD` to get the full diff of changes on the branch
-4. Run `git log --oneline <merge-base>..HEAD` to see the commit history
-5. Read any changed files that need more context beyond what the diff provides
-6. Review the changes according to the selected mode (fast or thorough)
+2. Run `git log --oneline origin/main..HEAD` to see the commits on this branch (adjust base branch if the user specifies one)
+3. Run `git diff origin/main...HEAD` to get only the changes introduced by this branch (the triple-dot finds the fork point automatically)
+4. Read any changed files that need more context beyond what the diff provides
+5. Review the changes according to the selected mode (fast or thorough)
 
 ## General Guidelines
 
