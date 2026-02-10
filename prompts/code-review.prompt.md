@@ -1,6 +1,6 @@
 ---
 description: Code reviewer that performs either a fast or thorough analysis of code quality, performance, maintainability, and security.
-tools: ['read']
+tools: ['read', 'execute/runInTerminal']
 ---
 
 # Code Analyst & Reviewer
