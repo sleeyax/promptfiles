@@ -28,6 +28,15 @@ ln -s $(pwd)/mcp.json ~/.config/Code/User/mcp.json
 # rm ~/.config/Code/User/mcp.json
 ```
 
+### Migrating from manual symlinks
+
+If you previously installed with `ln -s`, remove the old symlinks first and then use stow to manage them:
+
+```bash
+find ~/.config/Code/User/prompts/ -type l -lname "$(pwd)/*" -delete
+stow -t ~/.config/Code/User/prompts/ prompts agents
+```
+
 ## Resources
 
 - [Awesome copilot](https://github.com/github/awesome-copilot)
