@@ -16,14 +16,15 @@ cd promptfiles
 # create the prompts directory if it doesn't exist
 mkdir -p ~/.config/Code/User/prompts/
 
-# symlink all prompt files (flat structure)
-ln -s $(pwd)/prompts/* $(pwd)/agents/* ~/.config/Code/User/prompts/
+# symlink prompt files via stow
+stow -t ~/.config/Code/User/prompts/ prompts
+stow -t ~/.config/Code/User/prompts/ agents
 
 # symlink mcp.json
 ln -s $(pwd)/mcp.json ~/.config/Code/User/mcp.json
 
-# to uninstall (only removes symlinks pointing to this repo):
-# find ~/.config/Code/User/prompts/ -type l -lname "$(pwd)/*" -delete
+# to uninstall:
+# stow -D -t ~/.config/Code/User/prompts/ prompts agents
 # rm ~/.config/Code/User/mcp.json
 ```
 
