@@ -28,6 +28,19 @@ ln -s $(pwd)/mcp.json ~/.config/Code/User/mcp.json
 # rm ~/.config/Code/User/mcp.json
 ```
 
+### Claude Code
+
+Claude Code skills are installed per-skill into `~/.claude/skills/<skill-name>/SKILL.md`.
+
+```bash
+# install a skill (e.g. "phase")
+mkdir -p ~/.claude/skills/phase
+ln -s $(pwd)/skills/phase.md ~/.claude/skills/phase/SKILL.md
+
+# to uninstall:
+# rm -r ~/.claude/skills/phase
+```
+
 ### Migrating from manual symlinks
 
 If you previously installed with `ln -s`, remove the old symlinks first and then use stow to manage them:
