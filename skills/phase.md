@@ -35,7 +35,10 @@ Work through phases one at a time. For each phase:
    - Any decisions or trade-offs you made
 4. **Suggest a commit** — Propose a commit message following conventional style:
    > **Suggested commit:** `<type>: <concise description>`
-5. **Stop and wait** — Do not proceed to the next phase. Wait for the user to review, request changes, and confirm the commit.
+5. **Stop and wait** — Do not proceed to the next phase. Prompt the user for confirmation:
+   > `Continue to next phase? (y/n):`
+   - **y / Y / continue** — proceed to the next phase
+   - **n / N / anything else** — wait for feedback or further instructions
 
 ## Rules
 
