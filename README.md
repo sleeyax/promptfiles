@@ -30,15 +30,20 @@ ln -s $(pwd)/mcp.json ~/.config/Code/User/mcp.json
 
 ### Claude Code
 
-Claude Code skills are installed per-skill into `~/.claude/skills/<skill-name>/SKILL.md`.
-
 ```bash
-# install a skill (e.g. "phase")
+# install custom skills from this repo
 mkdir -p ~/.claude/skills/phase
 ln -s $(pwd)/skills/phase.md ~/.claude/skills/phase/SKILL.md
-
-# to uninstall:
+# to uninstall skills:
 # rm -r ~/.claude/skills/phase
+
+# install plugins
+claude plugins add rust-analyzer-lsp@claude-plugins-official
+claude plugins add frontend-design@claude-plugins-official
+claude plugins add context7@claude-plugins-official
+
+# install GSD (meta framework)
+npx get-shit-done-cc@latest
 ```
 
 ### Migrating from manual symlinks
