@@ -1,13 +1,6 @@
----
-description: Split implementation into multiple phases with user review and a commit after each phase.
-tools: ['read', 'edit', 'search', 'todo']
----
-
 # Multi-Phase Implementation
 
-## When to Use
-
-Use this skill when the user mentions "phase", "phases", "multi-phase", or "multiple phases" — or otherwise asks for their task to be broken into staged, incremental steps with review points between them.
+Task: $ARGUMENTS
 
 ## Role
 

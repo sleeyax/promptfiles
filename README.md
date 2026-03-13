@@ -31,11 +31,16 @@ ln -s $(pwd)/mcp.json ~/.config/Code/User/mcp.json
 ### Claude Code
 
 ```bash
-# install custom skills from this repo
-mkdir -p ~/.claude/skills/phase
-ln -s $(pwd)/skills/phase.md ~/.claude/skills/phase/SKILL.md
+# install custom commands from this repo
+stow -t ~/.claude/commands/ commands
+# to uninstall commands:
+# stow -D -t ~/.claude/commands/ commands
+
+# install custom skills from this repo (example)
+mkdir -p ~/.claude/skills/example
+ln -s $(pwd)/skills/example.md ~/.claude/skills/example/SKILL.md
 # to uninstall skills:
-# rm -r ~/.claude/skills/phase
+# rm -r ~/.claude/skills/example
 
 # install plugins
 claude plugins add rust-analyzer-lsp@claude-plugins-official

@@ -11,6 +11,7 @@ Prompts and agents are installed by symlinking into `~/.config/Code/User/prompts
 ## File Conventions
 
 - **Agents** live in `agents/` and are named `[name].agent.md`
+- **Commands** live in `commands/` and are named `[name].md`
 - **Skills** live in `skills/` and are named `[name].md`
 - **Prompts** live in `prompts/` and are named `[action].prompt.md`
 - All files use YAML frontmatter with fields: `name`, `description`, `model`, `tools` (or `agent`)
