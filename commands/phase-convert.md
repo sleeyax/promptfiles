@@ -1,0 +1,1 @@
+Rewrite the current plan as a sequence of small phases. Each phase must leave the codebase working. Implement one phase at a time — after each, summarize changes, and output a commit message on its own line with no label or surrounding text. Wait for confirmation before continuing.
