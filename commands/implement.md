@@ -39,36 +39,39 @@ If the relevant MCP server is unavailable, fall back to the CLI:
 
 If both the MCP server and the CLI are unavailable, stop and tell the user what to install.
 
-### 4. Set Up the Branch
+### 4. Plan the Implementation
 
-Check the current branch with `git rev-parse --abbrev-ref HEAD`.
-
-- If the current branch **is** the default branch (try `git symbolic-ref refs/remotes/origin/HEAD` to detect it; fall back to `main`):
-  1. Run `git fetch origin` and then `git pull --ff-only` to bring the default branch up to date.
-  2. Suggest a feature branch name derived from the issue title, following Conventional Commits style: `<type>/<kebab-case-summary>` (e.g. `feat/dark-mode-toggle`, `fix/login-redirect-loop`, `chore/bump-deps`). Pick the type from the issue's labels/content (`feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, etc.).
-  3. Use the `AskUserQuestion` tool to ask the user how to proceed, with these options:
-     - **Confirm** the suggested branch name (create and check it out)
-     - **Custom name** — supply their own branch name (create and check that one out instead)
-     - **Stay on default** — continue on the default branch and implement directly there
-  4. Create the chosen branch with `git checkout -b <name>` unless the user opted to stay on the default branch.
-- If the current branch is **already a custom branch** (not the default), stay on it and skip the branch setup.
-
-### 5. Plan the Implementation
-
-Once the issue is fetched, summarize:
+Once the issue is fetched, produce a plan that includes branch setup as **Phase 1**, then the actual implementation phases. The plan should cover:
 
 - **Title** and **issue number**
 - **Goal** — a 1-2 sentence restatement of what the issue is asking for
 - **Scope** — files/areas likely affected
 - **Open questions** — anything ambiguous in the issue that needs clarification
+- **Phases** — starting with:
+  - **Phase 1: Branch setup** (see step 5 below for the exact procedure and proposed branch name)
+  - **Phase 2+:** the implementation phases
 
-If the issue is unclear or missing key details, ask the user before writing any code.
+If the issue is unclear or missing key details, ask the user before finalizing the plan.
 
-### 6. Implement
+### 5. Implement
 
-Implement the changes. Follow the project's conventions (consult `CLAUDE.md` and surrounding code). Keep the change scoped to what the issue requests — do not bundle unrelated refactors.
+Once the plan is approved, execute the phases in order. **Phase 1 is always the branch setup**:
 
-### 7. Report
+1. Detect the default branch with `git symbolic-ref refs/remotes/origin/HEAD` (strip the `refs/remotes/origin/` prefix). Fall back to `main` if that fails.
+2. Detect the current branch with `git rev-parse --abbrev-ref HEAD`.
+3. **If already on a custom branch** (not the default), stay on it and move to Phase 2.
+4. **If on the default branch:**
+   1. Run `git fetch origin` and then `git pull --ff-only` to bring it up to date.
+   2. Suggest a feature branch name derived from the issue title, following Conventional Commits style: `<type>/<kebab-case-summary>` (e.g. `feat/dark-mode-toggle`, `fix/login-redirect-loop`, `chore/bump-deps`). Pick the type from the issue's labels/content (`feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, etc.).
+   3. Use the `AskUserQuestion` tool to ask how to proceed, with these options:
+      - **Confirm** the suggested branch name
+      - **Custom name** — supply their own branch name
+      - **Stay on default** — continue on the default branch
+   4. Unless the user chose **Stay on default**, run `git checkout -b <name>` and verify with `git rev-parse --abbrev-ref HEAD`.
+
+Then proceed with the remaining phases. Follow the project's conventions (consult `CLAUDE.md` and surrounding code). Keep the change scoped to what the issue requests — do not bundle unrelated refactors.
+
+### 6. Report
 
 When done, summarize:
 
@@ -78,5 +81,5 @@ When done, summarize:
 
 ## Notes
 
-- Do not create a commit, branch, or PR unless the user explicitly asks.
+- Do not create a commit or PR unless the user explicitly asks.
 - If the issue references other issues, PRs, or discussions, fetch them too when they're load-bearing for the implementation.
