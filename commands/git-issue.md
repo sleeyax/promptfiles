@@ -79,7 +79,10 @@ When done, summarize:
 - Anything you intentionally did not do, and why
 - Suggested next steps (tests to run, follow-up issues, etc.)
 
+### 7. Commit
+
+As the final phase, run the workflow defined in [git-commit.md](git-commit.md) to suggest a commit message and commit the changes after user confirmation.
+
 ## Notes
 
-- Do not create a commit or PR unless the user explicitly asks.
 - If the issue references other issues, PRs, or discussions, fetch them too when they're load-bearing for the implementation.
