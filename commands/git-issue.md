@@ -39,27 +39,11 @@ If the relevant MCP server is unavailable, fall back to the CLI:
 
 If both the MCP server and the CLI are unavailable, stop and tell the user what to install.
 
-### 4. Plan the Implementation
-
-Once the issue is fetched, produce a plan that includes branch setup as **Phase 1**, then the actual implementation phases. The plan should cover:
-
-- **Title** and **issue number**
-- **Goal** — a 1-2 sentence restatement of what the issue is asking for
-- **Scope** — files/areas likely affected
-- **Open questions** — anything ambiguous in the issue that needs clarification
-- **Phases** — starting with:
-  - **Phase 1: Branch setup** (see step 5 below for the exact procedure and proposed branch name)
-  - **Phase 2+:** the implementation phases
-
-If the issue is unclear or missing key details, ask the user before finalizing the plan.
-
-### 5. Implement
-
-Once the plan is approved, execute the phases in order. **Phase 1 is always the branch setup**:
+### 4. Set Up the Branch
 
 1. Detect the default branch with `git symbolic-ref refs/remotes/origin/HEAD` (strip the `refs/remotes/origin/` prefix). Fall back to `main` if that fails.
 2. Detect the current branch with `git rev-parse --abbrev-ref HEAD`.
-3. **If already on a custom branch** (not the default), stay on it and move to Phase 2.
+3. **If already on a custom branch** (not the default), stay on it and move to step 5.
 4. **If on the default branch:**
    1. Run `git fetch origin` and then `git pull --ff-only` to bring it up to date.
    2. Suggest a feature branch name derived from the issue title, following Conventional Commits style: `<type>/<kebab-case-summary>` (e.g. `feat/dark-mode-toggle`, `fix/login-redirect-loop`, `chore/bump-deps`). Pick the type from the issue's labels/content (`feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, etc.).
@@ -69,9 +53,15 @@ Once the plan is approved, execute the phases in order. **Phase 1 is always the 
       - **Stay on default** — continue on the default branch
    4. Unless the user chose **Stay on default**, run `git checkout -b <name>` and verify with `git rev-parse --abbrev-ref HEAD`.
 
-Then proceed with the remaining phases. Follow the project's conventions (consult `CLAUDE.md` and surrounding code). Keep the change scoped to what the issue requests — do not bundle unrelated refactors.
+### 5. Plan the Implementation
 
-### 6. Report
+Produce a plan whose shape fits the issue — let the work drive the structure rather than a fixed template. If the issue is unclear or missing key details, ask the user before finalizing the plan.
+
+### 6. Implement
+
+Once the plan is approved, execute it. Follow the project's conventions (consult `CLAUDE.md` and surrounding code). Keep the change scoped to what the issue requests — do not bundle unrelated refactors.
+
+### 7. Report
 
 When done, summarize:
 
@@ -79,11 +69,11 @@ When done, summarize:
 - Anything you intentionally did not do, and why
 - Suggested next steps (tests to run, follow-up issues, etc.)
 
-### 7. Commit
+### 8. Commit
 
-As the final phase, run the workflow defined in [git-commit.md](git-commit.md) to suggest a commit message and commit the changes.
+Run the workflow defined in [git-commit.md](git-commit.md) to suggest a commit message and commit the changes.
 
-**Do not commit without explicit user confirmation via `AskUserQuestion`.** The presence of this commit phase is not standing authorization to commit — it is authorization to *propose* a commit and wait for the user's explicit choice.
+**Do not commit without explicit user confirmation via `AskUserQuestion`.** This step is authorization to *propose* a commit and wait for the user's explicit choice — not standing authorization to commit.
 
 ## Notes
 
