@@ -19,5 +19,6 @@ Suggest a commit message for the current changes and commit it after user confir
    - Keep the first line under 70 characters
    - Focus on *why*, not *what*
    - For complex changes, include a body describing the *why* and any non-obvious context. For simple changes, a subject line alone is sufficient.
+   - In the body, do NOT insert hard line breaks mid-sentence. Either write the body as a single continuous paragraph (let the editor soft-wrap) or hard-wrap consistently at 72 characters. Never break lines arbitrarily.
 6. Use the `AskUserQuestion` tool to confirm with the user which message (if any) they want to commit with.
 7. If the user confirms, create the commit with the chosen message. If nothing is staged, stage the relevant files first. If the user declines, do not commit.
