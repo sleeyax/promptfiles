@@ -39,7 +39,21 @@ If the relevant MCP server is unavailable, fall back to the CLI:
 
 If both the MCP server and the CLI are unavailable, stop and tell the user what to install.
 
-### 4. Plan the Implementation
+### 4. Set Up the Branch
+
+Check the current branch with `git rev-parse --abbrev-ref HEAD`.
+
+- If the current branch **is** the default branch (try `git symbolic-ref refs/remotes/origin/HEAD` to detect it; fall back to `main`):
+  1. Run `git fetch origin` and then `git pull --ff-only` to bring the default branch up to date.
+  2. Suggest a feature branch name derived from the issue title, following Conventional Commits style: `<type>/<kebab-case-summary>` (e.g. `feat/dark-mode-toggle`, `fix/login-redirect-loop`, `chore/bump-deps`). Pick the type from the issue's labels/content (`feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, etc.).
+  3. Use the `AskUserQuestion` tool to ask the user how to proceed, with these options:
+     - **Confirm** the suggested branch name (create and check it out)
+     - **Custom name** — supply their own branch name (create and check that one out instead)
+     - **Stay on default** — continue on the default branch and implement directly there
+  4. Create the chosen branch with `git checkout -b <name>` unless the user opted to stay on the default branch.
+- If the current branch is **already a custom branch** (not the default), stay on it and skip the branch setup.
+
+### 5. Plan the Implementation
 
 Once the issue is fetched, summarize:
 
@@ -50,11 +64,11 @@ Once the issue is fetched, summarize:
 
 If the issue is unclear or missing key details, ask the user before writing any code.
 
-### 5. Implement
+### 6. Implement
 
 Implement the changes. Follow the project's conventions (consult `CLAUDE.md` and surrounding code). Keep the change scoped to what the issue requests — do not bundle unrelated refactors.
 
-### 6. Report
+### 7. Report
 
 When done, summarize:
 
