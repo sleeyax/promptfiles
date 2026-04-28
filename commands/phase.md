@@ -26,9 +26,8 @@ Work through phases one at a time. For each phase:
 3. **Summarize** — After implementation, provide:
    - A brief list of what changed (files added/modified/removed)
    - Any decisions or trade-offs you made
-4. **Suggest a commit** — Propose a commit message following conventional style:
-   > **Suggested commit:** `<type>: <concise description>`
-5. **Stop and wait** — Do not proceed to the next phase. Prompt the user for confirmation:
+4. **Offer to commit** — Run the full flow from [git-commit.md](git-commit.md) to propose and (on confirmation) create a commit for this phase's changes.
+5. **Stop and wait** — After the commit step (whether committed or skipped), do not proceed to the next phase. Prompt the user for confirmation:
    > `Continue to next phase? (y/n):`
    - **y / Y / continue** — proceed to the next phase
    - **n / N / anything else** — wait for feedback or further instructions
@@ -36,6 +35,7 @@ Work through phases one at a time. For each phase:
 ## Rules
 
 - **Never skip ahead.** Only implement the current phase.
-- **Never auto-commit.** The user decides when to commit.
-- **Absorb feedback.** If the user requests changes to the current phase, apply them before moving on.
+- **Never commit without confirmation.** Always offer the message(s) and wait for the user to pick one before running `git commit`.
+- **Match the repo's commit style.** Re-check `git log` if you're unsure — never assume conventional commits.
+- **Absorb feedback.** If the user requests changes to the current phase, apply them before moving on. If they edit the proposed commit message, use their version verbatim.
 - **Adapt the plan.** If work in a phase reveals that later phases need adjustment, mention this when summarizing and update the plan with the user's agreement.
