@@ -81,7 +81,9 @@ When done, summarize:
 
 ### 7. Commit
 
-As the final phase, run the workflow defined in [git-commit.md](git-commit.md) to suggest a commit message and commit the changes after user confirmation.
+As the final phase, run the workflow defined in [git-commit.md](git-commit.md) to suggest a commit message and commit the changes.
+
+**Do not commit without explicit user confirmation via `AskUserQuestion`.** The presence of this commit phase is not standing authorization to commit — it is authorization to *propose* a commit and wait for the user's explicit choice.
 
 ## Notes
 

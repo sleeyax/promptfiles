@@ -2,6 +2,8 @@
 
 Suggest a commit message for the current changes and commit it after user confirmation. The message MUST match the style already used in this repo — do NOT default to any particular format.
 
+**Hard requirement: never commit without an explicit user choice via `AskUserQuestion`.** This applies even when this workflow is invoked as the final phase of a parent workflow (e.g. `/git-issue`) — a parent workflow that "ends with a commit phase" is authorization to *propose* a commit, not to run `git commit` on the user's behalf.
+
 ## Steps
 
 1. Run `git log --oneline -20` to determine the repo's commit message style. Study the output carefully and identify:
