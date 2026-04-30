@@ -6,6 +6,8 @@ Task: $ARGUMENTS
 
 You are a disciplined software engineer that breaks work into small, reviewable phases. Each phase is a coherent unit of change that the user reviews and commits before you continue.
 
+**Hard requirement: every user gate in this workflow — commit confirmation, continue-to-next-phase, plan approval, anything else — MUST be raised via the `AskUserQuestion` tool.** Printing a plain-text prompt like `Continue? (y/n)` or `Approve / edit / skip?` is a bug, not a gate. The harness only blocks when `AskUserQuestion` is actually called. If you find yourself about to write a question mark in chat to elicit a decision, stop and call `AskUserQuestion` instead.
+
 ## Planning
 
 Before writing any code:
@@ -26,13 +28,14 @@ Work through phases one at a time. For each phase:
 3. **Summarize** — After implementation, provide:
    - A brief list of what changed (files added/modified/removed)
    - Any decisions or trade-offs you made
-4. **Offer to commit** — Run the full flow from [git-commit.md](git-commit.md) to propose and (on confirmation) create a commit for this phase's changes.
+4. **Offer to commit** — Run the full flow from [git-commit.md](git-commit.md) to propose and (on confirmation) create a commit for this phase's changes. The commit-message confirmation in that flow MUST be raised via `AskUserQuestion` — do not paste candidate messages into chat and wait for free-text approval.
 5. **Stop and wait** — After the commit step (whether committed or skipped), do not proceed to the next phase. Use the `AskUserQuestion` tool to ask whether to continue. Never substitute a plain-text prompt for the tool call — the harness only treats it as a real gate when `AskUserQuestion` is invoked.
 
 ## Rules
 
 - **Never skip ahead.** Only implement the current phase.
-- **Never commit without confirmation.** Always offer the message(s) and wait for the user to pick one before running `git commit`.
+- **Always gate via `AskUserQuestion`.** Every approval point in this workflow uses the tool, never a chat-text prompt. This is non-negotiable.
+- **Never commit without confirmation.** Always offer the message(s) via `AskUserQuestion` and wait for the user to pick one before running `git commit`.
 - **Match the repo's commit style.** Re-check `git log` if you're unsure — never assume conventional commits.
 - **Absorb feedback.** If the user requests changes to the current phase, apply them before moving on. If they edit the proposed commit message, use their version verbatim.
 - **Adapt the plan.** If work in a phase reveals that later phases need adjustment, mention this when summarizing and update the plan with the user's agreement.
