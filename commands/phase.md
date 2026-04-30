@@ -27,10 +27,7 @@ Work through phases one at a time. For each phase:
    - A brief list of what changed (files added/modified/removed)
    - Any decisions or trade-offs you made
 4. **Offer to commit** — Run the full flow from [git-commit.md](git-commit.md) to propose and (on confirmation) create a commit for this phase's changes.
-5. **Stop and wait** — After the commit step (whether committed or skipped), do not proceed to the next phase. Prompt the user for confirmation:
-   > `Continue to next phase? (y/n):`
-   - **y / Y / continue** — proceed to the next phase
-   - **n / N / anything else** — wait for feedback or further instructions
+5. **Stop and wait** — After the commit step (whether committed or skipped), do not proceed to the next phase. Use the `AskUserQuestion` tool to ask whether to continue. Never substitute a plain-text prompt for the tool call — the harness only treats it as a real gate when `AskUserQuestion` is invoked.
 
 ## Rules
 
