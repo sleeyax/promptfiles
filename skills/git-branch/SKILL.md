@@ -1,3 +1,8 @@
+---
+name: git-branch
+description: Suggest a branch name for the current work in the repo's existing naming style. If on the default branch, create the new branch after confirmation; if on a custom branch, propose renaming it. Use when the user asks for a branch name, wants to start a new branch, or wants to rename the current one.
+---
+
 # Git Branch
 
 Suggest a branch name for the current work. If on the default branch, create the branch after confirmation. If on a custom branch, propose renaming it.

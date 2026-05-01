@@ -1,3 +1,8 @@
+---
+name: git-commit
+description: Suggest a commit message that matches the repo's existing style and commit after explicit user confirmation. Use when the user asks to commit changes, wants a commit message proposal, or finishes a phase of work that needs a commit.
+---
+
 # Git Commit
 
 Suggest a commit message for the current changes and commit it after user confirmation. The message MUST match the style already used in this repo — do NOT default to any particular format.

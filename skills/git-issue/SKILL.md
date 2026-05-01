@@ -1,8 +1,13 @@
+---
+name: git-issue
+description: Implement a specific GitHub or GitLab issue end-to-end — fetch it, set up a branch, plan, implement, and propose a commit. Use when the user references an issue number/URL and wants it implemented.
+---
+
 # Implement Issue
 
 Issue: $ARGUMENTS
 
-Implement a specific issue from GitHub or GitLab. Example invocations: `/implement #1`, `/implement 2`.
+Implement a specific issue from GitHub or GitLab. Example invocations: `/git-issue #1`, `/git-issue 2`.
 
 ## Workflow
 
@@ -71,7 +76,7 @@ When done, summarize:
 
 ### 8. Commit
 
-Run the workflow defined in [git-commit.md](git-commit.md) to suggest a commit message and commit the changes.
+Invoke the [git-commit](../git-commit/SKILL.md) skill to suggest a commit message and commit the changes.
 
 **Do not commit without explicit user confirmation via `AskUserQuestion`.** This step is authorization to *propose* a commit and wait for the user's explicit choice — not standing authorization to commit.
 

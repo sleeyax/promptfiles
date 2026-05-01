@@ -1,3 +1,8 @@
+---
+name: phase
+description: Break a non-trivial implementation into small, sequential, individually committed phases with mandatory user gates between each one. Use when the user asks for a phased rollout, a multi-step implementation that should be reviewed in chunks, or when a task is too large to commit as a single change.
+---
+
 # Multi-Phase Implementation
 
 Task: $ARGUMENTS
@@ -28,7 +33,7 @@ Work through phases one at a time. For each phase:
 3. **Summarize** — After implementation, provide:
    - A brief list of what changed (files added/modified/removed)
    - Any decisions or trade-offs you made
-4. **Offer to commit** — Run the full flow from [git-commit.md](git-commit.md) to propose and (on confirmation) create a commit for this phase's changes. The commit-message confirmation in that flow MUST be raised via `AskUserQuestion` — do not paste candidate messages into chat and wait for free-text approval.
+4. **Offer to commit** — Invoke the [git-commit](../git-commit/SKILL.md) skill to propose and (on confirmation) create a commit for this phase's changes. The commit-message confirmation in that flow MUST be raised via `AskUserQuestion` — do not paste candidate messages into chat and wait for free-text approval.
 5. **Stop and wait** — After the commit step (whether committed or skipped), do not proceed to the next phase. Use the `AskUserQuestion` tool to ask whether to continue. Never substitute a plain-text prompt for the tool call — the harness only treats it as a real gate when `AskUserQuestion` is invoked.
 
 ## Rules

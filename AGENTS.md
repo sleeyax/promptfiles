@@ -6,15 +6,14 @@ This file provides guidance to AI agents when working with code in this reposito
 
 This is a curated collection of VS Code prompt files and AI agent definitions. There are no build steps, tests, or dependencies — the repository contains only static markdown files with YAML frontmatter and an MCP server configuration.
 
-Prompts and agents are installed by symlinking into `~/.config/Code/User/prompts/`.
+Prompts and agents are installed by symlinking into `~/.config/Code/User/prompts/`. Skills (used as Claude Code's replacement for slash commands in this repo) are installed via the [`skills`](https://www.npmjs.com/package/skills) npm CLI; agents, prompts, and `mcp.json` are still installed by symlink.
 
 ## File Conventions
 
 - **Agents** live in `agents/` and are named `[name].agent.md`
-- **Commands** live in `commands/` and are named `[name].md`
-- **Skills** live in `skills/` and are named `[name].md`
+- **Skills** live in `skills/<name>/SKILL.md` (one subdirectory per skill, file always named `SKILL.md` — required for `npx skills` discovery). Skill frontmatter must include `name` and `description`.
 - **Prompts** live in `prompts/` and are named `[action].prompt.md`
-- All files use YAML frontmatter with fields: `name`, `description`, `model`, `tools` (or `agent`)
+- Agents and prompts use YAML frontmatter with fields: `name`, `description`, `model`, `tools` (or `agent`)
 - Agents use `tools` to declare capabilities (e.g., `read`, `edit`, `search`)
 - Simple prompts use `agent` instead (e.g., `agent: edit`, `agent: ask`)
 
