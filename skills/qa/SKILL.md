@@ -47,23 +47,34 @@ If `git status --porcelain` is non-empty, use `AskUserQuestion` with options:
   - GitHub: `gh api repos/{owner}/{repo}/pulls/{n}/comments` and `gh pr view <n> --json reviews,comments`
   - GitLab: `glab` equivalents
 - "Open" = any review thread not marked resolved, plus issue-level comments posted after the latest commit by someone other than the PR author.
-- If none, skip to step 6.
+- If none, skip to step 7.
 
-### 5. Address comments per-comment
+### 5. Plan commit grouping
 
-For each open comment:
+Before touching any code, look at the full set of open comments and decide upfront how the resulting fixes should be grouped into commits. Bias toward **multiple smaller commits**, not one big one — a single bundled commit is only correct when the comments genuinely describe one coherent change.
+
+Group by:
+- Same file + same logical concern → one commit
+- Different concerns (e.g. a typo fix + a bug fix + a refactor request) → separate commits, even if the files overlap
+- Pure formatting/style nits → their own commit, separate from behavioral fixes
+
+Present the proposed grouping (a short list: each group → which comments it covers → one-line intent) and confirm via `AskUserQuestion` with options: **Use this grouping**, **Adjust** (user describes changes), **One commit per comment**, **Single bundled commit**.
+
+### 6. Address comments per-comment
+
+For each open comment, in group order:
 
 1. Show author, `file:line`, body. Read surrounding code.
 2. Propose a concrete fix in chat.
 3. `AskUserQuestion` with options: **Apply**, **Skip**, **Custom** (user steers), **Stop addressing comments**.
-4. On **Apply**: make the edit. Use judgment for commit grouping — closely-related fixes in the same area can be bundled; large/independent fixes get their own commit. When ready to commit a group, invoke the [git-commit](../git-commit/SKILL.md) skill (which itself requires confirmation).
+4. On **Apply**: make the edit. When the last comment in a group is applied, invoke the [git-commit](../git-commit/SKILL.md) skill to commit that group (it requires its own confirmation). Do **not** roll a group's changes into a later group's commit.
 
 After all comments are processed, if any commits were made:
 
 - `AskUserQuestion`: **Push to remote?** On yes, `git push` (or `git push -u origin <branch>` if no upstream).
 - `AskUserQuestion`: **Resolve addressed threads?** On yes, resolve each thread the user marked **Apply** on, via MCP/CLI.
 
-### 6. Hand off for manual QA
+### 7. Hand off for manual QA
 
 Print a short handoff block:
 
