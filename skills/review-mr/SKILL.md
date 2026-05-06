@@ -15,7 +15,7 @@ Review a GitLab MR like a senior engineer on the team and post findings as **dra
 - Never push, commit, or modify the cwd repo's working tree without explicit `AskUserQuestion` confirm.
 - Every finding cites a real `+` (added) line in the actual diff. Removed-line comments are out of scope.
 - Posting is gated by exactly one explicit `AskUserQuestion` confirm covering the whole batch.
-- On any partial failure during posting, run the helper's `--discard-mine` mode for the IDs already posted in this run, then surface the error.
+- The agent writes **exactly one** `findings.json` per run (matching `findings.schema.json`) and invokes `post-draft-note.sh` **exactly once**. No per-finding shell calls. Rollback on partial failure is the helper's job.
 - GitLab MCP server first if available; fall back to `glab`. If neither, stop.
 - **Never dump the full diff to a file or to chat, or hand it to a subagent as one blob.** When the cwd repo matches the MR, read the diff incrementally from `git` (per-file, on demand) — not from `glab api .../diffs`. The API `diffs` endpoint is only used when there is no local checkout, and even then read it page-by-page, one file at a time, never as one bulk write. To measure size up front, use `/merge_requests/<iid>/changes` (metadata + per-file stats), not `/diffs`. This rule still holds when the user picks **Review whole diff anyway** — that answer authorizes the *scope*, not bulk-dumping.
 
@@ -94,46 +94,58 @@ Senior-engineer mindset. Walk the file list (or the user-picked subset) **one pa
 - Multi-line ranges use the `-N+M` span on the `suggestion` block (`N` lines before anchor, `M` after; `-0+0` = anchor only).
 - Severity tiers (metadata only — never mentioned in the body): `blocker`, `concern`, `suggestion`, `nit`.
 
-### 8. Format findings
+### 8. Build the in-memory findings list
 
-Fill `COMMENT_TEMPLATE.md` per inline finding and `SUMMARY_TEMPLATE.md` for the summary. Hold all findings in an in-memory list of objects:
+For each finding, fill the `body` field by rendering `COMMENT_TEMPLATE.md` (inline) or `SUMMARY_TEMPLATE.md` (summary). Hold the working set as an in-memory list of objects shaped like the schema in `findings.schema.json`:
 
 ```
-{ id, severity, path, line, lineSpan, title, body, suggestion }
+{ severity, path, oldPath, line, title, body }   // per inline finding
+{ body }                                          // summary (optional)
 ```
 
-Summary is a separate object with no `path`/`line`.
+`title` is for the pre-submission UI only — it doesn't get posted (it's already inside `body`). `severity` is metadata for sorting; not posted.
 
 ### 9. Pre-submission review loop
 
 1. Print numbered list to chat:
-   - `[N] <severity> · <path>:<line(-range)> · <title>` + 1-line body preview
+   - `[N] <severity> · <path>:<line> · <title>` + 1-line body preview
    - Summary as `[S]`
 2. `AskUserQuestion`: **Post all** / **Drop some** / **Edit some** / **Cancel**.
 3. **Drop some** → ask which numbers, remove them, loop back to step 1.
-4. **Edit some** → ask which single number, then enter free-form chat about *that* comment. Editable: `title`, `body`, `suggestion`, `path`, `line`, `lineSpan`. After each round, `AskUserQuestion`: **Done** / **Keep editing** / **Discard this comment**. Only **Done** locks in changes; only then loop back to step 1.
+4. **Edit some** → ask which single number, then free-form chat about *that* comment. Editable: `title`, `body`, `path`, `line`. After each round, `AskUserQuestion`: **Done** / **Keep editing** / **Discard this comment**. Only **Done** locks in changes; only then loop back to step 1.
 5. **Post all** → step 10.
 6. **Cancel** → drop everything, exit without posting.
 
 ### 10. Post (single batch)
 
-1. **Idempotency check.** `glab api "projects/<id>/merge_requests/<iid>/draft_notes"` to list existing drafts. Skip any new finding whose `(path, line, title)` already matches an existing bot-authored draft. Tell the user how many were skipped.
-2. For each remaining inline finding:
-   - Write its body to `mktemp -t review-draft-XXXXXX.md`.
-   - Call `./post-draft-note.sh --project <id> --mr <iid> --body-file <tmp> --path <new_path> --old-path <old_path> --line <new_line> --base-sha <base> --start-sha <start> --head-sha <head>`.
-   - Track the returned ID in a session array.
-   - Delete the temp file.
-3. Post the summary the same way but with no `--path`/`--line`/`--*-sha` flags.
-4. **On any HTTP failure mid-batch**: call `./post-draft-note.sh --discard-mine --project <id> --mr <iid> --ids <comma-separated-IDs-from-this-run>`, then surface the error and stop.
+1. Serialize the in-memory list to a `findings.json` file at `mktemp -t review-mr-findings-XXXXXX.json`. Top-level shape:
 
-The helper script lives next to this file. Resolve its path relative to `SKILL.md`.
+   ```json
+   {
+     "diffRefs": { "baseSha": "...", "startSha": "...", "headSha": "..." },
+     "summary":  { "body": "..." },
+     "findings": [ { "severity": "...", "path": "...", "oldPath": "...", "line": N, "title": "...", "body": "..." } ]
+   }
+   ```
+
+   Drop the `title` from the JSON if it adds noise — it's optional. Schema lives next to this file at `findings.schema.json`; consult it for the authoritative shape.
+
+2. Invoke the helper exactly once:
+
+   ```
+   ./post-draft-note.sh --project <id> --mr <iid> --findings <tmp.json>
+   ```
+
+   The helper script lives next to this file. It validates the JSON against `findings.schema.json`, idempotency-checks against existing drafts, posts the batch, and rolls back via `DELETE` on any HTTP failure. On success it prints one line of JSON: `{"posted":N,"skipped":M,"ids":[...]}` to stdout. On failure it forwards the error to stderr and exits non-zero.
+
+3. **On success**, delete the findings file. **On failure**, leave it in place and tell the user the path so they can inspect or retry.
 
 ### 11. Report
 
 Print:
 - MR title + URL
 - `<mr_url>#drafts` direct link
-- Counts (posted, skipped-as-duplicate)
+- `posted` / `skipped` counts from the helper's success JSON
 - Reminder: review is **unpublished**. The user publishes or discards via the GitLab UI or `glab`.
 
 Then stop.

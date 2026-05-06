@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GitLab MR review findings",
+  "type": "object",
+  "required": ["diffRefs", "findings"],
+  "additionalProperties": false,
+  "properties": {
+    "diffRefs": {
+      "type": "object",
+      "required": ["baseSha", "startSha", "headSha"],
+      "additionalProperties": false,
+      "properties": {
+        "baseSha":  { "type": "string", "minLength": 7 },
+        "startSha": { "type": "string", "minLength": 7 },
+        "headSha":  { "type": "string", "minLength": 7 }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["body"],
+      "additionalProperties": false,
+      "properties": {
+        "body": { "type": "string", "minLength": 1 }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "path", "oldPath", "line", "body"],
+        "additionalProperties": false,
+        "properties": {
+          "severity": { "enum": ["blocker", "concern", "suggestion", "nit"] },
+          "path":     { "type": "string", "minLength": 1 },
+          "oldPath":  { "type": "string", "minLength": 1 },
+          "line":     { "type": "integer", "minimum": 1 },
+          "title":    { "type": "string" },
+          "body":     { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}
