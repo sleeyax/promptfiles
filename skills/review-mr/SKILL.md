@@ -17,6 +17,7 @@ Review a GitLab MR like a senior engineer on the team and post findings as **dra
 - Posting is gated by exactly one explicit `AskUserQuestion` confirm covering the whole batch.
 - On any partial failure during posting, run the helper's `--discard-mine` mode for the IDs already posted in this run, then surface the error.
 - GitLab MCP server first if available; fall back to `glab`. If neither, stop.
+- **Never dump the full diff to a file or to chat, or hand it to a subagent as one blob.** When the cwd repo matches the MR, read the diff incrementally from `git` (per-file, on demand) — not from `glab api .../diffs`. The API `diffs` endpoint is only used when there is no local checkout, and even then read it page-by-page, one file at a time, never as one bulk write. To measure size up front, use `/merge_requests/<iid>/changes` (metadata + per-file stats), not `/diffs`. This rule still holds when the user picks **Review whole diff anyway** — that answer authorizes the *scope*, not bulk-dumping.
 
 ## Workflow
 
@@ -45,42 +46,49 @@ glab api "projects/<urlencoded-path>"
 
 Capture `.id` and use that numeric `project_id` for every later call.
 
-### 4. Fetch MR context
+### 4. Fetch MR metadata only
 
-Get title, description, source/target branch, `state`, `diff_refs` (`base_sha`, `start_sha`, `head_sha`), and per-file diffs.
+Get **only** title, description, source/target branch, `state`, `diff_refs` (`base_sha`, `start_sha`, `head_sha`), and the **changed-files list with stats** (paths + per-file additions/deletions). **Do not fetch full diff text yet.**
 
-- MCP: corresponding tools.
+- MCP: corresponding tools (metadata only).
 - CLI:
-  - `glab api "projects/<id>/merge_requests/<iid>"`
-  - `glab api "projects/<id>/merge_requests/<iid>/diffs"`
+  - `glab api "projects/<id>/merge_requests/<iid>"` — metadata + `diff_refs`
+  - `glab api "projects/<id>/merge_requests/<iid>/changes" --paginate` — file list + stats. Parse paths and counts; **do not save the response to a file**.
 
 **Bail early** with a clear message if:
 - `state` is `closed` or `merged`
 - `diff_refs` is missing or null
 
-### 5. Diff-size guardrail
+### 5. Local checkout (preferred)
 
-If the diff exceeds **800 changed lines** *or* **30 changed files**, `AskUserQuestion`:
-- **Pick files** (Recommended) — user supplies a subset of paths to review
-- **Review whole diff anyway**
-- **Cancel**
-
-### 6. Local checkout (best-effort)
-
-If `git remote -v` in cwd matches the MR's project:
+If `git remote -v` in cwd matches the MR's project, check out **before** reading any diff content:
 
 1. `git status --porcelain` clean check. If dirty, `AskUserQuestion`: **Stash** (`git stash push -u -m "review: pre-checkout"`) / **Abort**.
 2. `git fetch origin`
 3. `glab mr checkout <iid>` to land on the MR's source branch.
-4. Read files from this checkout while reviewing.
 
-If cwd is unrelated to the project, review from the diff alone and note the limitation in the summary.
+From this point, the diff source is **`git`, not the API**:
+- Per-file diff: `git diff <base_sha>...<head_sha> -- <path>` on demand, one path at a time.
+- File contents at HEAD: read the file directly from the working tree.
+
+If cwd is unrelated to the project, review from the API diff alone — fetch one file at a time via `glab api "projects/<id>/merge_requests/<iid>/diffs?page=N&per_page=1"`, never bulk. Note the diff-only limitation in the summary.
+
+### 6. Diff-size guardrail
+
+Using only the file list + stats from step 4 (no full diff text needed), if the changeset exceeds **800 changed lines** *or* **30 changed files**, `AskUserQuestion`:
+- **Pick files** (Recommended) — user supplies a subset of paths to review
+- **Review whole diff anyway**
+- **Cancel**
+
+The chosen subset is the only set of paths the agent will pull diffs for in step 7.
 
 ### 7. Perform the review
 
-Senior-engineer mindset:
+Senior-engineer mindset. Walk the file list (or the user-picked subset) **one path at a time**:
 
+- For each path, pull its diff on demand (`git diff <base_sha>...<head_sha> -- <path>` if checked out, else one paginated API call) and read the file from the working tree to confirm context.
 - Read-only inspection. No commands, no installs, no writes.
+- **Never write the diff or any file's full contents to disk.** Hold what you need in working memory; move on once a file is reviewed.
 - Nits, style suggestions, naming, and small refactors are allowed; flag at the appropriate severity.
 - Each finding cites a concrete `+` line — or contiguous `+` line range — in the new file.
 - Multi-line ranges use the `-N+M` span on the `suggestion` block (`N` lines before anchor, `M` after; `-0+0` = anchor only).
