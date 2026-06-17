@@ -43,18 +43,6 @@ find ~/.claude/skills -mindepth 1 -type d -empty -delete
 npx skills add sleeyax/promptfiles
 ```
 
-### Claude Code extras
-
-Recommended plugins and meta frameworks (Claude Code only):
-
-```bash
-claude plugins add rust-analyzer-lsp@claude-plugins-official
-claude plugins add frontend-design@claude-plugins-official
-claude plugins add context7@claude-plugins-official
-
-npx get-shit-done-cc@latest
-```
-
 ### Vscode extras
 
 VS Code expects all prompt files in a flat structure at `~/.config/Code/User/prompts/`.
@@ -78,3 +66,31 @@ ln -s $(pwd)/mcp.json ~/.config/Code/User/mcp.json
 ## Resources
 
 - [Awesome copilot](https://github.com/github/awesome-copilot)
+
+## Harnesses
+
+### Claude Code
+
+#### CLAUDE.md
+
+`harnesses/claude/CLAUDE.md` holds my global Claude Code user instructions. Symlink it so it applies across all devices:
+
+```bash
+ln -s $(pwd)/harnesses/claude/CLAUDE.md ~/.claude/CLAUDE.md
+
+# to uninstall:
+# rm ~/.claude/CLAUDE.md
+```
+
+#### Extras
+
+Recommended plugins and meta frameworks (Claude Code only):
+
+```bash
+claude plugins add rust-analyzer-lsp@claude-plugins-official
+claude plugins add frontend-design@claude-plugins-official
+claude plugins add context7@claude-plugins-official
+
+# Optional, but useful for some workflows:
+npx get-shit-done-cc@latest
+```
