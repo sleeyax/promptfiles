@@ -1,5 +1,5 @@
 ---
-name: git-issue
+name: implement
 description: Implement a specific GitHub or GitLab issue end-to-end — fetch it, set up a branch, plan, implement, and propose a commit. Use when the user references an issue number/URL and wants it implemented.
 ---
 
@@ -7,7 +7,7 @@ description: Implement a specific GitHub or GitLab issue end-to-end — fetch it
 
 Issue: $ARGUMENTS
 
-Implement a specific issue from GitHub or GitLab. Example invocations: `/git-issue #1`, `/git-issue 2`.
+Implement a specific issue from GitHub or GitLab. Example invocations: `/implement #1`, `/implement 2`.
 
 ## Workflow
 
