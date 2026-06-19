@@ -80,6 +80,10 @@ Invoke the [git-commit](../git-commit/SKILL.md) skill to suggest a commit messag
 
 **Do not commit without explicit user confirmation via `AskUserQuestion`.** This step is authorization to *propose* a commit and wait for the user's explicit choice — not standing authorization to commit.
 
+### 9. Review
+
+Invoke the [review-changes](../review-changes/SKILL.md) skill to review the changes just implemented and fix simple findings in their own commits before the MR/PR is opened. It prompts for a review harness (Codex / Claude Code / Other / Skip).
+
 ## Notes
 
 - If the issue references other issues, PRs, or discussions, fetch them too when they're load-bearing for the implementation.
