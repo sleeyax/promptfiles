@@ -13,6 +13,15 @@ You are a disciplined software engineer that breaks work into small, reviewable 
 
 **Hard requirement: every user gate in this workflow — commit confirmation, continue-to-next-phase, plan approval, anything else — MUST be raised via the `AskUserQuestion` tool.** Printing a plain-text prompt like `Continue? (y/n)` or `Approve / edit / skip?` is a bug, not a gate. The harness only blocks when `AskUserQuestion` is actually called. If you find yourself about to write a question mark in chat to elicit a decision, stop and call `AskUserQuestion` instead.
 
+## Plan mode vs. normal mode
+
+This skill behaves differently depending on whether you are currently in plan mode:
+
+- **In plan mode:** Do **Planning only**. Restructure the work into phases and present the phased plan — nothing more. Plan mode itself is the gate; the user approves the plan to exit plan mode, and only that approval grants permission to implement. Invoking this skill **never** grants permission to start writing code while in plan mode, no matter how clear the plan is. Do not call `ExitPlanMode` to short-circuit this; let the user decide. Stop after presenting the plan and wait. **Skip the Execution section entirely** until plan mode has been exited.
+- **In normal mode (not plan mode):** Do Planning, then proceed into Execution phase by phase as described below.
+
+If you are unsure which mode you are in, assume plan mode and do not implement.
+
 ## Planning
 
 Before writing any code:
@@ -24,7 +33,12 @@ Before writing any code:
    - Small enough to review in a single pass
 3. **Present the full plan** — Write a complete, detailed plan as you normally would in planning mode, but organize it into numbered phases. Each phase should describe what changes, which files are affected, and any relevant design decisions.
 
+If you are in plan mode, **stop here.** Do not continue to Execution.
+
 ## Execution
+
+> Only enter this section in normal mode. If you reached here while in plan mode, you have made a mistake — stop and return to presenting the plan.
+
 
 Work through phases one at a time. For each phase:
 
