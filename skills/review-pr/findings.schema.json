@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GitHub PR review findings",
+  "type": "object",
+  "required": ["commitId", "findings"],
+  "additionalProperties": false,
+  "properties": {
+    "commitId": { "type": "string", "minLength": 7 },
+    "summary": {
+      "type": "object",
+      "required": ["body"],
+      "additionalProperties": false,
+      "properties": {
+        "body": { "type": "string", "minLength": 1 }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "path", "line", "side", "body"],
+        "additionalProperties": false,
+        "properties": {
+          "severity":  { "enum": ["blocker", "concern", "suggestion", "nit"] },
+          "path":      { "type": "string", "minLength": 1 },
+          "line":      { "type": "integer", "minimum": 1 },
+          "side":      { "enum": ["LEFT", "RIGHT"] },
+          "startLine": { "type": "integer", "minimum": 1 },
+          "startSide": { "enum": ["LEFT", "RIGHT"] },
+          "title":     { "type": "string" },
+          "body":      { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

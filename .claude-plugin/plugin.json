@@ -7,6 +7,7 @@
     "./skills/phase",
     "./skills/refine",
     "./skills/review-changes",
-    "./skills/review-mr"
+    "./skills/review-mr",
+    "./skills/review-pr"
   ]
 }

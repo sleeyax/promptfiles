@@ -91,12 +91,12 @@ Senior-engineer mindset. Walk the file list (or the user-picked subset) **one pa
 - **Never write the diff or any file's full contents to disk.** Hold what you need in working memory; move on once a file is reviewed.
 - Nits, style suggestions, naming, and small refactors are allowed; flag at the appropriate severity.
 - Each finding cites a concrete `+` line — or contiguous `+` line range — in the new file.
-- Multi-line ranges use the `-N+M` span on the `suggestion` block (`N` lines before anchor, `M` after; `-0+0` = anchor only).
+- GitLab suggestion fence is ` ```suggestion:-N+M `: the span replaces the anchor line plus `N` preceding and `M` following lines (`-0+0` = anchor only). This is the concrete fence the shared `COMMENT_TEMPLATE.md` defers to.
 - Severity tiers (metadata only — never mentioned in the body): `blocker`, `concern`, `suggestion`, `nit`.
 
 ### 8. Build the in-memory findings list
 
-For each finding, fill the `body` field by rendering `COMMENT_TEMPLATE.md` (inline) or `SUMMARY_TEMPLATE.md` (summary). Hold the working set as an in-memory list of objects shaped like the schema in `findings.schema.json`:
+For each finding, fill the `body` field by rendering `COMMENT_TEMPLATE.md` (inline) or `SUMMARY_TEMPLATE.md` (summary) — both symlinked in from `../_internal/`. Substitute the templates' `<skill-url>` footer placeholder with `https://github.com/sleeyax/promptfiles/blob/main/skills/review-mr/SKILL.md`. Hold the working set as an in-memory list of objects shaped like the schema in `findings.schema.json`:
 
 ```
 { severity, path, oldPath, line, title, body }   // per inline finding
