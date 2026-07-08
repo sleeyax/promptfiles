@@ -1,0 +1,12 @@
+{
+  "name": "sleeyax-skills",
+  "skills": [
+    "./skills/git-branch",
+    "./skills/git-commit",
+    "./skills/implement",
+    "./skills/phase",
+    "./skills/refine",
+    "./skills/review-changes",
+    "./skills/review-mr"
+  ]
+}

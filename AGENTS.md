@@ -12,6 +12,7 @@ Prompts and agents are installed by symlinking into `~/.config/Code/User/prompts
 
 - **Agents** live in `agents/` and are named `[name].agent.md`
 - **Skills** live in `skills/<name>/SKILL.md` (one subdirectory per skill, file always named `SKILL.md` — required for `npx skills` discovery). Skill frontmatter must include `name` and `description`.
+  - `.claude-plugin/plugin.json` lists every skill path under a `name` field so `skills list` groups them under a "Sleeyax Skills" header. The `skills` array is maintained manually — when adding or renaming a skill directory, update `.claude-plugin/plugin.json` too, or the new skill won't be grouped.
 - **Prompts** live in `prompts/` and are named `[action].prompt.md`
 - Agents and prompts use YAML frontmatter with fields: `name`, `description`, `model`, `tools` (or `agent`)
 - Agents use `tools` to declare capabilities (e.g., `read`, `edit`, `search`)
