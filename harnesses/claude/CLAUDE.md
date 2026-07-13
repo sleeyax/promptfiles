@@ -11,6 +11,10 @@
 
 - Prefer conventional commits unless otherwise specified.
 
+## Local Docker databases
+
+- When working with a database running in a local Docker container, prefer the tooling inside the container (via `docker [compose] exec`) to inspect or modify data. Only fall back to host tooling when the required tool is not available inside the container.
+
 ## Plans
 
 - At the end of each plan, give me a list of unresolved questions to answer, if any. Make the questions extremely concise. Sacrifice grammar for the sake of concision.
