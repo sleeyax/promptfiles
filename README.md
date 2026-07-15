@@ -63,10 +63,6 @@ ln -s $(pwd)/mcp.json ~/.config/Code/User/mcp.json
 # rm ~/.config/Code/User/mcp.json
 ```
 
-## Resources
-
-- [Awesome copilot](https://github.com/github/awesome-copilot)
-
 ## Harnesses
 
 ### Claude Code
