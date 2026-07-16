@@ -6,6 +6,7 @@
 - In code comments and git commit messages, put each sentence on its own single line.
 - Never hard-wrap: do not break a sentence across multiple lines, no matter how long the line gets.
 - Never split or hyphenate a word across lines.
+- If you need a paragraph-long comment to justify why the workaround is OK, the code is wrong — fix the code.
 
 ## Git
 
