@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Implement a specific GitHub or GitLab issue end-to-end — fetch it, set up a branch, plan, implement, and propose a commit. Use when the user references an issue number/URL and wants it implemented.
+description: Implement a specific GitHub or GitLab issue end-to-end — fetch it, set up a branch, plan, implement, propose a commit, and review the result. Use when the user references an issue number/URL and wants it implemented.
 ---
 
 # Implement Issue
