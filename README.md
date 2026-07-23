@@ -46,12 +46,8 @@ mkdir -p ~/.config/Code/User/prompts/
 # symlink agent files via stow
 stow -t ~/.config/Code/User/prompts/ agents
 
-# symlink mcp.json
-ln -s $(pwd)/mcp.json ~/.config/Code/User/mcp.json
-
 # to uninstall:
 # stow -D -t ~/.config/Code/User/prompts/ agents
-# rm ~/.config/Code/User/mcp.json
 ```
 
 ## Harnesses
