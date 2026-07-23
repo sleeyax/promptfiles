@@ -10,6 +10,7 @@
     "./skills/question",
     "./skills/refine",
     "./skills/review-changes",
-    "./skills/review-mr"
+    "./skills/review-mr",
+    "./skills/suggest-icon"
   ]
 }
