@@ -1,15 +1,20 @@
 # promptfiles
 
-My collection of prompt files for various AI models and applications.
+My collection of skills, agents, and prompts for day-to-day agentic coding.
+
+> [!NOTE]
+> Everything in this repo is designed to fit **my** personal workflow and preferences. You're welcome to use it as-is or as inspiration for your own setup, but it evolves constantly and comes with no stable versioning guarantees. Anything in here may change or disappear without notice.
 
 ## Installation
 
 ### Skills
 
-This repo's slash-command-style workflows are packaged as agent skills, installed via the [`skills`](https://www.npmjs.com/package/skills) CLI. The CLI supports Claude Code, Codex, Cursor, OpenCode, and [50+ other agents](https://github.com/vercel-labs/skills#supported-agents) — pass `-a <agent>` to target one (or omit and the CLI will prompt).
+Skills are reusable markdown instructions that agents like Claude Code load on demand to handle a specific task or workflow.
+
+Install via the [`skills`](https://www.npmjs.com/package/skills) CLI:
 
 ```bash
-# install 
+# install
 npx skills add sleeyax/promptfiles
 
 # update
@@ -29,19 +34,6 @@ npx skills add . -s '*'
 ```
 
 Verify with `npx skills list -g`.
-
-#### Migrating from the old manual install
-
-The old install put commands under `~/.claude/commands/` via `stow` and any skills under `~/.claude/skills/` via `ln -s`. Run from the root of your local clone to tear those down and re-install via the CLI:
-
-```bash
-# remove old command + skill symlinks pointing into this repo, prune empty dirs
-find ~/.claude/commands ~/.claude/skills -type l -lname "$(pwd)/*" -delete
-find ~/.claude/skills -mindepth 1 -type d -empty -delete
-
-# re-install via the skills CLI
-npx skills add sleeyax/promptfiles
-```
 
 ### Vscode extras
 
@@ -80,13 +72,9 @@ ln -s $(pwd)/harnesses/claude/CLAUDE.md ~/.claude/CLAUDE.md
 
 #### Extras
 
-Recommended plugins and meta frameworks (Claude Code only):
+Recommended plugins:
 
 ```bash
-claude plugins add rust-analyzer-lsp@claude-plugins-official
 claude plugins add frontend-design@claude-plugins-official
 claude plugins add context7@claude-plugins-official
-
-# Optional, but useful for some workflows:
-npx get-shit-done-cc@latest
 ```
