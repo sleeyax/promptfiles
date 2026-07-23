@@ -35,20 +35,34 @@ npx skills add . -s '*'
 
 Verify with `npx skills list -g`.
 
-### Vscode extras
+### Agents
 
-VS Code expects all prompt files in a flat structure at `~/.config/Code/User/prompts/`.
+Agents are custom subagents that the main agent can delegate specialized tasks to. The markdown files in `agents/` are the single source of truth, written in Claude Code's agent format.
+
+#### Claude Code
+
+Claude Code discovers agents in `~/.claude/agents/`:
 
 ```bash
-# create the prompts directory if it doesn't exist
-mkdir -p ~/.config/Code/User/prompts/
+# create the agents directory if it doesn't exist
+mkdir -p ~/.claude/agents/
 
 # symlink agent files via stow
-stow -t ~/.config/Code/User/prompts/ agents
+stow -t ~/.claude/agents/ agents
 
 # to uninstall:
-# stow -D -t ~/.config/Code/User/prompts/ agents
+# stow -D -t ~/.claude/agents/ agents
 ```
+
+#### Codex
+
+Codex expects agents as TOML files in `~/.codex/agents/`, so they can't be symlinked directly. Generate them from the markdown sources instead:
+
+```bash
+./scripts/install-codex-agents.sh
+```
+
+Rerun the script after editing an agent file.
 
 ## Harnesses
 
