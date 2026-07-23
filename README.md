@@ -1,6 +1,6 @@
 # promptfiles
 
-My collection of skills, agents, and prompts for day-to-day agentic coding.
+My collection of skills and agents for day-to-day agentic coding.
 
 > [!NOTE]
 > Everything in this repo is designed to fit **my** personal workflow and preferences. You're welcome to use it as-is or as inspiration for your own setup, but it evolves constantly and comes with no stable versioning guarantees. Anything in here may change or disappear without notice.
@@ -43,15 +43,14 @@ VS Code expects all prompt files in a flat structure at `~/.config/Code/User/pro
 # create the prompts directory if it doesn't exist
 mkdir -p ~/.config/Code/User/prompts/
 
-# symlink prompt files via stow
-stow -t ~/.config/Code/User/prompts/ prompts
+# symlink agent files via stow
 stow -t ~/.config/Code/User/prompts/ agents
 
 # symlink mcp.json
 ln -s $(pwd)/mcp.json ~/.config/Code/User/mcp.json
 
 # to uninstall:
-# stow -D -t ~/.config/Code/User/prompts/ prompts agents
+# stow -D -t ~/.config/Code/User/prompts/ agents
 # rm ~/.config/Code/User/mcp.json
 ```
 
