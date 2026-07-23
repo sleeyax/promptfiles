@@ -5,6 +5,7 @@
     "./skills/git-branch",
     "./skills/git-commit",
     "./skills/implement",
+    "./skills/init-agents",
     "./skills/phase",
     "./skills/refine",
     "./skills/review-changes",
