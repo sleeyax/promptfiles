@@ -1,6 +1,6 @@
 ---
 name: phase
-description: Break a non-trivial implementation into small, sequential, individually committed phases with mandatory user gates between each one. Use when the user asks for a phased rollout, a multi-step implementation that should be reviewed in chunks, or when a task is too large to commit as a single change.
+description: Break a non-trivial implementation into small, sequential, individually committed phases with mandatory user gates between each one. Use proactively whenever a plan or task can be split into multiple phases — do not wait for the user to ask for a phased approach.
 ---
 
 # Multi-Phase Implementation
