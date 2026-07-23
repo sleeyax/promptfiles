@@ -7,6 +7,7 @@
     "./skills/implement",
     "./skills/init-agents",
     "./skills/phase",
+    "./skills/question",
     "./skills/refine",
     "./skills/review-changes",
     "./skills/review-mr"
