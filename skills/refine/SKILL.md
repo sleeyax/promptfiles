@@ -9,6 +9,10 @@ Ask the questions one at a time.
 
 If a question can be answered by exploring the codebase, explore the codebase instead.
 
+# Domain modeling
+
+Before starting the interview, check whether a `CONTEXT.md` or `CONTEXT-MAP.md` exists at the repository root. If one exists, domain modeling is set up for this repo: use the `domain-modeling` skill throughout the interview — challenge terms against the glossary, sharpen fuzzy language, and record resolved terms and decisions as they crystallise. If neither file exists, skip this section and run the interview exactly as described here.
+
 # Asking questions
 
 Ask exactly one question per turn, then halt and wait for the user's response before continuing. Never batch questions, never proceed on assumed answers, never self-answer and move on. The user must remain in control of the pace.
