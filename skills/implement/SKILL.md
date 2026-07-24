@@ -82,7 +82,7 @@ Invoke the [git-commit](../git-commit/SKILL.md) skill to suggest a commit messag
 
 ### 9. Review
 
-Invoke the [review-changes](../review-changes/SKILL.md) skill to review the changes just implemented and fix simple findings in their own commits before the MR/PR is opened. It prompts for a review harness (Codex / Claude Code / Other / Skip).
+Invoke the [review-changes](../review-changes/SKILL.md) skill to review the changes just implemented and fix simple findings in their own commits before the MR/PR is opened. It prompts for a reviewer (Codex / Claude Code / Other / Skip), offering whatever the current harness can drive.
 
 ## Notes
 
