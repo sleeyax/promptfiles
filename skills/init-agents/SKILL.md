@@ -1,6 +1,7 @@
 ---
 name: init-agents
-description: Initialize or improve an AGENTS.md file with a trimmed, non-obvious-only codebase guide, plus a CLAUDE.md stub that imports it. Use when the user wants to bootstrap agent instructions for a repository.
+description: Initialize or improve an AGENTS.md file with a trimmed, non-obvious-only codebase guide, plus a CLAUDE.md stub that imports it.
+disable-model-invocation: true
 ---
 
 # Init AGENTS.md

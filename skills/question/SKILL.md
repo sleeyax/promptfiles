@@ -1,6 +1,7 @@
 ---
 name: question
-description: Answer a question about what was discussed or done in the current conversation, without modifying anything. Only use when the user explicitly invokes /question; never trigger proactively.
+description: Answer a question about what was discussed or done in the current conversation, without modifying anything.
+disable-model-invocation: true
 ---
 
 # Question

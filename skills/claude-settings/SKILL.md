@@ -1,6 +1,7 @@
 ---
 name: claude-settings
-description: Toggle token-hungry Claude Code features (bundled skills, workflows, artifacts, hooks, auto memory, built-in tools, ...) on or off via ~/.claude/settings.json to shrink the system prompt. Only use when the user explicitly invokes /claude-settings; never trigger proactively.
+description: Toggle token-hungry Claude Code features (bundled skills, workflows, artifacts, hooks, auto memory, built-in tools, ...) on or off via ~/.claude/settings.json to shrink the system prompt.
+disable-model-invocation: true
 ---
 
 # Claude Settings
