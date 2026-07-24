@@ -16,6 +16,7 @@
     "./skills/refine-issue",
     "./skills/review-changes",
     "./skills/review-mr",
+    "./skills/setup-pre-commit",
     "./skills/suggest-icon"
   ]
 }
