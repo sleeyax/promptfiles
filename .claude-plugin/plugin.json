@@ -10,6 +10,7 @@
     "./skills/phase",
     "./skills/question",
     "./skills/refine",
+    "./skills/refine-issue",
     "./skills/review-changes",
     "./skills/review-mr",
     "./skills/suggest-icon"
