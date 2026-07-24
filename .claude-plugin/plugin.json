@@ -1,6 +1,7 @@
 {
   "name": "sleeyax-skills",
   "skills": [
+    "./skills/address-review",
     "./skills/domain-modeling",
     "./skills/git-branch",
     "./skills/git-commit",
