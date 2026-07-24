@@ -4,6 +4,7 @@
     "./skills/address-review",
     "./skills/agent-brief",
     "./skills/brainstorm",
+    "./skills/claude-settings",
     "./skills/dispatch",
     "./skills/domain-modeling",
     "./skills/git-branch",
