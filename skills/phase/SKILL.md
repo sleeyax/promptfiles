@@ -13,14 +13,14 @@ You are a disciplined software engineer that breaks work into small, reviewable 
 
 **Hard requirement: every user gate in this workflow — commit confirmation, continue-to-next-phase, plan approval, anything else — is a real stop: ask, then wait for the answer.** Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer, and never ask a question and then keep working in the same turn.
 
-## Plan mode vs. normal mode
+## Planning gate
 
-This skill behaves differently depending on whether you are currently in plan mode:
+Planning always comes first, and it is always gated — the difference between harnesses is only *what* the gate is.
 
-- **In plan mode:** Do **Planning only**. Restructure the work into phases and present the phased plan — nothing more. Plan mode itself is the gate; the user approves the plan to exit plan mode, and only that approval grants permission to implement. Invoking this skill **never** grants permission to start writing code while in plan mode, no matter how clear the plan is. Do not call `ExitPlanMode` to short-circuit this; let the user decide. Stop after presenting the plan and wait. **Skip the Execution section entirely** until plan mode has been exited.
-- **In normal mode (not plan mode):** Do Planning, then proceed into Execution phase by phase as described below.
+- **You're in the harness's planning mode** (plan mode in Claude Code, `/plan` in Codex): do **Planning only**. That mode is the gate — the user leaves it to approve, and only that grants permission to implement. Invoking this skill **never** grants permission to start writing code while in it, no matter how clear the plan is, and never leave the mode yourself to get around it (in Claude Code: don't call `ExitPlanMode`). Present the plan, stop, and wait. **Skip the Execution section entirely** until the harness leaves planning mode.
+- **You're not in a planning mode** (the harness has none, or the user didn't enter it): present the phased plan and ask for approval yourself, in the form described under Role. That question is the gate. Only start Execution once the user approves.
 
-If you are unsure which mode you are in, assume plan mode and do not implement.
+Either way, presenting the plan and implementing it never happen in the same turn. If you can't tell which case you're in, present the plan and ask — never implement unasked.
 
 ## Planning
 
@@ -31,13 +31,13 @@ Before writing any code:
    - Self-contained: the codebase compiles/works after the phase is applied
    - Focused: one logical concern per phase (e.g., "add data model", "wire up API", "build UI")
    - Small enough to review in a single pass
-3. **Present the full plan** — Write a complete, detailed plan as you normally would in planning mode, but organize it into numbered phases. Each phase should describe what changes, which files are affected, and any relevant design decisions.
+3. **Present the full plan** — Write a complete, detailed plan as you normally would when planning, but organize it into numbered phases. Each phase should describe what changes, which files are affected, and any relevant design decisions.
 
-If you are in plan mode, **stop here.** Do not continue to Execution.
+**Stop here** until the planning gate has been passed. Do not continue to Execution.
 
 ## Execution
 
-> Only enter this section in normal mode. If you reached here while in plan mode, you have made a mistake — stop and return to presenting the plan.
+> Only enter this section once the planning gate is passed — the harness left planning mode, or the user approved the plan. If you reached here any other way, you have made a mistake — stop and return to presenting the plan.
 
 
 Work through phases one at a time. For each phase:

@@ -33,9 +33,9 @@ Check the project root for an existing AGENTS.md and CLAUDE.md before doing anyt
 
 ### 2. Explore the codebase
 
-Launch a subagent to survey the project: manifest files (package.json, Cargo.toml, pyproject.toml, go.mod, etc.), README, Makefile/build configs, CI config, and any existing AI tool configs (.cursor/rules/, .cursorrules, .github/copilot-instructions.md, .windsurfrules, .clinerules).
+Survey the project: manifest files (package.json, Cargo.toml, pyproject.toml, go.mod, etc.), README, Makefile/build configs, CI config, and any existing AI tool configs (.cursor/rules/, .cursorrules, .github/copilot-instructions.md, .windsurfrules, .clinerules). If the harness can spawn subagents (e.g. the Agent tool in Claude Code), delegate the survey to one to keep the file dumps out of the main context; otherwise do it inline.
 
-Have it detect:
+Detect:
 
 - Build, test, and lint commands — especially non-standard ones, and how to run a single test
 - Code style rules that differ from language defaults
