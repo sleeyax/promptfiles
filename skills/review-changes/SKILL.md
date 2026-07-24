@@ -24,13 +24,31 @@ The skill runs in whichever harness the user invoked it from (Claude Code, Codex
 
 ### 1. Determine scope
 
-1. Detect the base branch: `git symbolic-ref refs/remotes/origin/HEAD` (strip the `refs/remotes/origin/` prefix); fall back to `main`.
-2. Detect the current branch: `git rev-parse --abbrev-ref HEAD`.
-3. Default scope is the branch's committed changes vs the base: `<base>...HEAD`.
-4. `$ARGUMENTS` may override:
-   - a branch name → use it as the base.
+1. Detect the current branch: `git rev-parse --abbrev-ref HEAD`.
+2. Detect the base branch. **Do not assume the repo default** — a branch cut from an integration branch like `develop` diffs against *that*, not `main`. Take the first of these that resolves, and don't fall through to the next once one does:
+   1. **Recorded base** — `git config --get agent-branch.<current>.base`, set by the [git-branch](../git-branch/SKILL.md) skill when the branch was created. Use it if the ref still exists (`git rev-parse --verify`).
+   2. **Nearest branch by fork distance** — the branch whose fork point is closest to HEAD:
+
+      ```sh
+      cur=$(git rev-parse --abbrev-ref HEAD)
+      git for-each-ref --format='%(refname:short)' refs/heads refs/remotes/origin |
+        grep -vxE "origin/HEAD|$cur|origin/$cur" |
+        while read -r ref; do
+          mb=$(git merge-base "$ref" HEAD) || continue
+          echo "$(git rev-list --count "$mb..HEAD") $(git rev-list --count "$mb..$ref") $ref"
+        done | sort -n -k1,1 -k2,2 | head -5
+      ```
+
+      Column 1 is how many commits HEAD has since the fork — the review scope — and column 2 how far the candidate has moved on since. Take the lowest column 1. Compare fork points, **not** `merge-base --is-ancestor`: an ancestor test only matches a base that hasn't advanced since the fork, and silently falls through to `main` the moment the integration branch gets one more commit — which is exactly the failure this ladder exists to prevent.
+
+      On a tie in column 1, prefer a candidate that exists on `origin` (integration branches are pushed; local scratch branches often aren't). If it's still tied, ask the user which base to use rather than picking one.
+   3. **Repo default** — `git symbolic-ref refs/remotes/origin/HEAD` (strip the `refs/remotes/origin/` prefix); fall back to `main`.
+3. State the resolved base and which of the three rules produced it before running the review, so a wrong guess is visible immediately instead of surfacing as a bloated diff.
+4. Default scope is the branch's committed changes vs the base: `<base>...HEAD`.
+5. `$ARGUMENTS` may override:
+   - a branch name → use it as the base, skipping the detection above.
    - `uncommitted` → review staged + unstaged + untracked changes instead.
-5. If there's no diff in scope, report that there's nothing to review and stop.
+6. If there's no diff in scope, report that there's nothing to review and stop.
 
 ### 2. Identify the current harness
 
@@ -110,6 +128,7 @@ Ask: **Re-review** (run another pass from step 3, to confirm the fixes are clean
 
 Summarize:
 
+- The base branch the review ran against.
 - Reviewer + model used, and how it ran (in-process subagent or CLI).
 - Counts: findings found / fixed / left for the reviewer.
 - The fix commit SHAs.

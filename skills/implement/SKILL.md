@@ -56,7 +56,7 @@ If both the MCP server and the CLI are unavailable, stop and tell the user what 
       - **Confirm** the suggested branch name
       - **Custom name** — supply their own branch name
       - **Stay on default** — continue on the default branch
-   4. Unless the user chose **Stay on default**, run `git checkout -b <name>` and verify with `git rev-parse --abbrev-ref HEAD`.
+   4. Unless the user chose **Stay on default**, run `git checkout -b <name>` and verify with `git rev-parse --abbrev-ref HEAD`. Then record the base with `git config agent-branch.<name>.base <default-branch>` — see the [git-branch](../git-branch/SKILL.md) skill's base branch convention.
 
 ### 5. Plan the Implementation
 
