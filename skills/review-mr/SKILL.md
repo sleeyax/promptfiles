@@ -12,9 +12,10 @@ Review a GitLab MR like a senior engineer on the team and post findings as **dra
 ## Hard rules
 
 - Never `publish` draft notes — leave them for the user.
-- Never push, commit, or modify the cwd repo's working tree without explicit `AskUserQuestion` confirm.
+- Every gate — dirty-tree, diff-size, pre-submission — is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer.
+- Never push, commit, or modify the cwd repo's working tree without an explicit confirm.
 - Every finding cites a real `+` (added) line in the actual diff. Removed-line comments are out of scope.
-- Posting is gated by exactly one explicit `AskUserQuestion` confirm covering the whole batch.
+- Posting is gated by exactly one explicit confirm covering the whole batch.
 - The agent writes **exactly one** `findings.json` per run (matching `findings.schema.json`) and invokes `post-draft-note.sh` **exactly once**. No per-finding shell calls. Rollback on partial failure is the helper's job.
 - GitLab MCP server first if available; fall back to `glab`. If neither, stop.
 - **Never dump the full diff to a file or to chat, or hand it to a subagent as one blob.** When the cwd repo matches the MR, read the diff incrementally from `git` (per-file, on demand) — not from `glab api .../diffs`. The API `diffs` endpoint is only used when there is no local checkout, and even then read it page-by-page, one file at a time, never as one bulk write. To measure size up front, use `/merge_requests/<iid>/changes` (metadata + per-file stats), not `/diffs`. This rule still holds when the user picks **Review whole diff anyway** — that answer authorizes the *scope*, not bulk-dumping.
@@ -63,7 +64,7 @@ Get **only** title, description, source/target branch, `state`, `diff_refs` (`ba
 
 If `git remote -v` in cwd matches the MR's project, check out **before** reading any diff content:
 
-1. `git status --porcelain` clean check. If dirty, `AskUserQuestion`: **Stash** (`git stash push -u -m "review: pre-checkout"`) / **Abort**.
+1. `git status --porcelain` clean check. If dirty, ask: **Stash** (`git stash push -u -m "review: pre-checkout"`) / **Abort**.
 2. `git fetch origin`
 3. `glab mr checkout <iid>` to land on the MR's source branch.
 
@@ -75,7 +76,7 @@ If cwd is unrelated to the project, review from the API diff alone — fetch one
 
 ### 6. Diff-size guardrail
 
-Using only the file list + stats from step 4 (no full diff text needed), if the changeset exceeds **800 changed lines** *or* **30 changed files**, `AskUserQuestion`:
+Using only the file list + stats from step 4 (no full diff text needed), if the changeset exceeds **800 changed lines** *or* **30 changed files**, ask:
 - **Pick files** (Recommended) — user supplies a subset of paths to review
 - **Review whole diff anyway**
 - **Cancel**
@@ -110,9 +111,9 @@ For each finding, fill the `body` field by rendering `COMMENT_TEMPLATE.md` (inli
 1. Print numbered list to chat:
    - `[N] <severity> · <path>:<line> · <title>` + 1-line body preview
    - Summary as `[S]`
-2. `AskUserQuestion`: **Post all** / **Drop some** / **Edit some** / **Cancel**.
+2. Ask: **Post all** / **Drop some** / **Edit some** / **Cancel**.
 3. **Drop some** → ask which numbers, remove them, loop back to step 1.
-4. **Edit some** → ask which single number, then free-form chat about *that* comment. Editable: `title`, `body`, `path`, `line`. After each round, `AskUserQuestion`: **Done** / **Keep editing** / **Discard this comment**. Only **Done** locks in changes; only then loop back to step 1.
+4. **Edit some** → ask which single number, then free-form chat about *that* comment. Editable: `title`, `body`, `path`, `line`. After each round, ask: **Done** / **Keep editing** / **Discard this comment**. Only **Done** locks in changes; only then loop back to step 1.
 5. **Post all** → step 10.
 6. **Cancel** → drop everything, exit without posting.
 

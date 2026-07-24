@@ -7,7 +7,7 @@ description: Suggest a commit message that matches the repo's existing style and
 
 Suggest a commit message for the current changes and commit it after user confirmation. The message MUST match the style already used in this repo — do NOT default to any particular format.
 
-**Hard requirement: never commit without an explicit user choice via `AskUserQuestion`.** This applies even when this workflow is invoked as the final phase of a parent workflow (e.g. `/implement`) — a parent workflow that "ends with a commit phase" is authorization to *propose* a commit, not to run `git commit` on the user's behalf.
+**Hard requirement: never commit without an explicit user choice.** Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. This applies even when this workflow is invoked as the final phase of a parent workflow (e.g. `/implement`) — a parent workflow that "ends with a commit phase" is authorization to *propose* a commit, not to run `git commit` on the user's behalf.
 
 ## Steps
 
@@ -25,5 +25,5 @@ Suggest a commit message for the current changes and commit it after user confir
    - Focus on *why*, not *what*
    - For complex changes, include a body describing the *why* and any non-obvious context. For simple changes, a subject line alone is sufficient.
    - In the body, do NOT insert hard line breaks mid-sentence. Either write the body as a single continuous paragraph (let the editor soft-wrap) or hard-wrap consistently at 72 characters. Never break lines arbitrarily.
-6. Use the `AskUserQuestion` tool to confirm with the user which message (if any) they want to commit with.
+6. Ask the user which message (if any) they want to commit with, and wait for the answer.
 7. If the user confirms, create the commit with the chosen message. If nothing is staged, stage the relevant files first. If the user declines, do not commit.

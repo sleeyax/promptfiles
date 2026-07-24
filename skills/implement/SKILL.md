@@ -52,7 +52,7 @@ If both the MCP server and the CLI are unavailable, stop and tell the user what 
 4. **If on the default branch:**
    1. Run `git fetch origin` and then `git pull --ff-only` to bring it up to date.
    2. Suggest a feature branch name derived from the issue title, following Conventional Commits style: `<type>/<kebab-case-summary>` (e.g. `feat/dark-mode-toggle`, `fix/login-redirect-loop`, `chore/bump-deps`). Pick the type from the issue's labels/content (`feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, etc.).
-   3. Use the `AskUserQuestion` tool to ask how to proceed, with these options:
+   3. Ask how to proceed and wait for the answer, with these options:
       - **Confirm** the suggested branch name
       - **Custom name** — supply their own branch name
       - **Stay on default** — continue on the default branch
@@ -78,7 +78,7 @@ When done, summarize:
 
 Invoke the [git-commit](../git-commit/SKILL.md) skill to suggest a commit message and commit the changes.
 
-**Do not commit without explicit user confirmation via `AskUserQuestion`.** This step is authorization to *propose* a commit and wait for the user's explicit choice — not standing authorization to commit.
+**Do not commit without explicit user confirmation.** This step is authorization to *propose* a commit and wait for the user's explicit choice — not standing authorization to commit.
 
 ### 9. Review
 

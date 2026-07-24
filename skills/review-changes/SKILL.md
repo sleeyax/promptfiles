@@ -15,7 +15,7 @@ The chosen harness is the **reviewer** (read-only). This skill's agent is the **
 
 - The review step is read-only. Only this skill's agent edits files, and only after the step 5 apply gate.
 - Auto-fix **only** localized, unambiguous findings (see step 4). Report everything else for the human reviewer — never silently make architectural, security-sensitive, behaviour-changing, or judgement-call edits.
-- Every gate — harness choice, apply, dirty-tree, re-review — uses `AskUserQuestion`, never a plain-text prompt. Commits go through the `git-commit` skill's own gate.
+- Every gate — harness choice, apply, dirty-tree, re-review — is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer. Commits go through the `git-commit` skill's own gate.
 - Never push. The user pushes manually.
 - Don't dump the full diff into a prompt or hand it to the review subagent as one blob. Give the subagent the base ref and let it run `git diff` / read files itself.
 
@@ -33,7 +33,7 @@ The chosen harness is the **reviewer** (read-only). This skill's agent is the **
 
 ### 2. Choose the review harness
 
-`AskUserQuestion` — "Review changes?":
+Ask — "Review changes?":
 
 - **Codex** (Recommended) — Codex CLI, default model.
 - **Claude Code** — a read-only review subagent, default model.
@@ -66,9 +66,9 @@ Print a numbered list. For each finding show its bucket, location, and — for t
 
 ### 5. Apply the fixes
 
-First, if the working tree is dirty, `AskUserQuestion`: **Stash** (restore after) / **Proceed anyway** / **Report only** — so per-finding fix commits stay clean.
+First, if the working tree is dirty, ask: **Stash** (restore after) / **Proceed anyway** / **Report only** — so per-finding fix commits stay clean.
 
-Then `AskUserQuestion`: **Apply proposed fixes** / **Pick a subset** / **Report only (no changes)**.
+Then ask: **Apply proposed fixes** / **Pick a subset** / **Report only (no changes)**.
 
 On apply: edit only the chosen simple findings. Keep the change tight to each finding — no unrelated refactors — and confirm each fix is actually correct.
 
@@ -78,7 +78,7 @@ One commit per finding, grouped only when a few fixes clearly belong together. F
 
 ### 7. Offer a re-review
 
-`AskUserQuestion`: **Re-review** (run another pass from step 2, to confirm the fixes are clean and catch anything new) / **Finish**.
+Ask: **Re-review** (run another pass from step 2, to confirm the fixes are clean and catch anything new) / **Finish**.
 
 ### 8. Report
 

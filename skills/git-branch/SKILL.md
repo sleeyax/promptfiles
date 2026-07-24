@@ -7,7 +7,7 @@ description: Suggest a branch name for the current work in the repo's existing n
 
 Suggest a branch name for the current work. If on the default branch, create the branch after confirmation. If on a custom branch, propose renaming it.
 
-**Hard requirement: never create or rename a branch without an explicit user choice via `AskUserQuestion`.**
+**Hard requirement: never create or rename a branch without an explicit user choice.** Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies.
 
 ## Steps
 
@@ -26,6 +26,6 @@ Suggest a branch name for the current work. If on the default branch, create the
    - Keep names concise but descriptive
    - Match the repo's prefix/separator conventions exactly
 6. Branch off the right base:
-   - **If on the default branch:** run `git fetch origin` and `git pull --ff-only` first to bring it up to date. Use `AskUserQuestion` to confirm which suggested name (if any) to use, with a **Custom name** option. On confirmation, run `git checkout -b <name>` and verify with `git rev-parse --abbrev-ref HEAD`.
-   - **If on a custom branch:** use `AskUserQuestion` to confirm renaming the existing branch to one of the suggested names, with a **Custom name** option and a **Cancel** option. On confirmation, run `git branch -m <new-name>`. If the branch tracks a remote, warn the user that the remote branch will need to be updated separately (`git push origin -u <new-name>` and delete the old remote branch) and ask whether to do that now.
+   - **If on the default branch:** run `git fetch origin` and `git pull --ff-only` first to bring it up to date. Ask which suggested name (if any) to use, with a **Custom name** option. On confirmation, run `git checkout -b <name>` and verify with `git rev-parse --abbrev-ref HEAD`.
+   - **If on a custom branch:** ask whether to rename the existing branch to one of the suggested names, with a **Custom name** option and a **Cancel** option. On confirmation, run `git branch -m <new-name>`. If the branch tracks a remote, warn the user that the remote branch will need to be updated separately (`git push origin -u <new-name>` and delete the old remote branch) and ask whether to do that now.
 7. If the user declines, do not change the branch.
