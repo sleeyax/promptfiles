@@ -1,9 +1,14 @@
 ---
 name: refine
 description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, refine their design, or mentions "refine this".
+argument-hint: "The plan or design to refine (defaults to the current conversation)"
 ---
 
+Subject: $ARGUMENTS
+
 Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+
+`$ARGUMENTS` names what to refine. Empty means the plan or design already under discussion in this conversation.
 
 Ask the questions one at a time.
 
