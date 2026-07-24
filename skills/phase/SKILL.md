@@ -17,10 +17,10 @@ You are a disciplined software engineer that breaks work into small, reviewable 
 
 Planning always comes first, and it is always gated — the difference between harnesses is only *what* the gate is.
 
-- **You're in the harness's planning mode** (plan mode in Claude Code, `/plan` in Codex): do **Planning only**. That mode is the gate — the user leaves it to approve, and only that grants permission to implement. Invoking this skill **never** grants permission to start writing code while in it, no matter how clear the plan is, and never leave the mode yourself to get around it (in Claude Code: don't call `ExitPlanMode`). Present the plan, stop, and wait. **Skip the Execution section entirely** until the harness leaves planning mode.
-- **You're not in a planning mode** (the harness has none, or the user didn't enter it): present the phased plan and ask for approval yourself, in the form described under Role. That question is the gate. Only start Execution once the user approves.
+- **You're in the harness's planning mode** (plan mode in Claude Code, `/plan` in Codex): do **Planning only**. That mode is the gate — the user leaves it to approve, and only that grants permission to implement. Invoking this skill **never** grants permission to start writing code while in it, no matter how clear the plan is, and never leave the mode yourself to get around it (in Claude Code: don't call `ExitPlanMode`). Present the updated, phased plan, stop, and wait. **Skip the Execution section entirely** until the harness leaves planning mode.
+- **You're not in a planning mode** (the harness has none, or the user didn't enter it): present the updated, phased plan and ask for approval yourself, in the form described under Role. That question is the gate. Only start Execution once the user approves.
 
-Either way, presenting the plan and implementing it never happen in the same turn. If you can't tell which case you're in, present the plan and ask — never implement unasked.
+Either way: what you present is the **phased** plan produced below, never the original plan you started from — restating that one is not passing the gate. Presenting it and implementing it never happen in the same turn. If you can't tell which case you're in, present the updated plan and ask — never implement unasked.
 
 ## Planning
 
@@ -31,13 +31,13 @@ Before writing any code:
    - Self-contained: the codebase compiles/works after the phase is applied
    - Focused: one logical concern per phase (e.g., "add data model", "wire up API", "build UI")
    - Small enough to review in a single pass
-3. **Present the full plan** — Write a complete, detailed plan as you normally would when planning, but organize it into numbered phases. Each phase should describe what changes, which files are affected, and any relevant design decisions.
+3. **Present the full phased plan** — Write a complete, detailed plan as you normally would when planning, but organize it into numbered phases. Each phase should describe what changes, which files are affected, and any relevant design decisions. Show this restructured version in full — never point back to an earlier plan or present it unchanged, even when the phases only regroup work the user has already seen.
 
 **Stop here** until the planning gate has been passed. Do not continue to Execution.
 
 ## Execution
 
-> Only enter this section once the planning gate is passed — the harness left planning mode, or the user approved the plan. If you reached here any other way, you have made a mistake — stop and return to presenting the plan.
+> Only enter this section once the planning gate is passed — the harness left planning mode, or the user approved the plan. If you reached here any other way, you have made a mistake — stop and return to presenting the phased plan.
 
 
 Work through phases one at a time. For each phase:
