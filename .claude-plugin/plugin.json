@@ -3,6 +3,7 @@
   "skills": [
     "./skills/address-review",
     "./skills/agent-brief",
+    "./skills/brainstorm",
     "./skills/dispatch",
     "./skills/domain-modeling",
     "./skills/git-branch",
