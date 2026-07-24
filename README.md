@@ -79,6 +79,16 @@ ln -s $(pwd)/harnesses/claude/CLAUDE.md ~/.claude/CLAUDE.md
 # rm ~/.claude/CLAUDE.md
 ```
 
+#### settings.json
+
+`harnesses/claude/settings.json` holds the global Claude Code settings I want on every host. Claude Code rewrites this file at runtime (e.g. when switching models), so instead of symlinking it, the script deep-merges the tracked keys into the host's existing `~/.claude/settings.json`. Tracked keys win; any other host-local settings are left untouched. Requires [`jq`](https://jqlang.github.io/jq/).
+
+```bash
+./scripts/install-claude-settings.sh
+```
+
+Rerun the script after editing the tracked settings file.
+
 #### Extras
 
 Recommended plugins:
