@@ -74,7 +74,9 @@ Skip this step only when step 4 found no gaps.
 
 ### 6. Write the brief
 
-Render the brief (template and principles below) and show it in full in chat. Then ask how to record it:
+Invoke the [agent-brief](../agent-brief/SKILL.md) skill to render the brief, with the issue thread plus everything the interview settled as its source. Gaps are **blocking** here — step 5 closed them — so anything still open means the interview isn't finished. **Agent's discretion** is for detail the user deliberately chose to leave to the implementer.
+
+Show the brief in full in chat. Then ask how to record it:
 
 - **Comment on the issue** (Recommended) — post the brief as a new comment. The issue body is untouched.
 - **Replace the body, keep the original** — the issue body becomes the brief, with the original text preserved verbatim in a collapsed block at the bottom:
@@ -108,38 +110,4 @@ Summarize:
 
 ## The agent brief
 
-The brief is the contract the implementing agent works from. The original body and discussion are context; the brief is what gets built.
-
-Three principles:
-
-- **Durable** — the issue may sit for weeks while the codebase moves. Describe interfaces, types, and behavioral contracts. Never reference file paths or line numbers, and don't assume today's implementation structure survives.
-- **Behavioral, not procedural** — say *what* the system should do. The implementing agent explores fresh and decides *how*.
-- **Testable** — every acceptance criterion must be independently verifiable. "Works correctly" is not a criterion.
-- **Self-contained** — the brief is read on the tracker, where the repo's glossary isn't. Use the project's terms, but define any whose meaning a newcomer would guess wrong, and point at `CONTEXT.md` for the rest.
-
-Template:
-
-```markdown
-## Agent Brief
-
-**Summary:** one line — what needs to happen
-
-**Current behavior:**
-What happens today. For a bug, the broken behavior; for an enhancement, the status quo it builds on.
-
-**Desired behavior:**
-What should happen once the work is done, including edge cases and error handling.
-
-**Key interfaces:**
-- `TypeName` — what changes and why
-- `functionName()` — current contract vs desired contract
-
-**Acceptance criteria:**
-- [ ] specific, independently verifiable criterion
-- [ ] ...
-
-**Out of scope:**
-- adjacent thing that must not change
-```
-
-Drop a section when the issue genuinely has nothing to put in it — an empty heading is noise. Fill in **Out of scope** only when something adjacent actually came up and was deliberately excluded; don't invent a boundary just to have one.
+The brief is the contract the implementing agent works from. The original body and discussion are context; the brief is what gets built. Its template and principles live in the [agent-brief](../agent-brief/SKILL.md) skill.
