@@ -1,6 +1,6 @@
-# promptfiles
+# skills
 
-My collection of skills and agents for day-to-day agentic coding.
+My collection of skills for day-to-day agentic coding.
 
 > [!NOTE]
 > Everything in this repo is designed to fit **my** personal workflow and preferences. You're welcome to use it as-is or as inspiration for your own setup, but it evolves constantly and comes with no stable versioning guarantees. Anything in here may change or disappear without notice.
@@ -15,13 +15,13 @@ Install via the [`skills`](https://www.npmjs.com/package/skills) CLI:
 
 ```bash
 # install
-npx skills add sleeyax/promptfiles
+npx skills add sleeyax/skills
 
 # update
 npx skills update
 
 # uninstall
-npx skills remove sleeyax/promptfiles
+npx skills remove sleeyax/skills
 ```
 
 #### Local development
