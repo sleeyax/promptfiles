@@ -26,7 +26,7 @@ npx skills remove sleeyax/skills
 
 #### Local development
 
-Install skills from your local clone so edits to `./skills/<name>/SKILL.md` are live in your agent:
+Install skills from your local clone so edits to `./skills/<category>/<name>/SKILL.md` are live in your agent:
 
 ```bash
 # from the root of this repo (-s '*' = all skills, -y = skip prompts)

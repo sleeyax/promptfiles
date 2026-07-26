@@ -11,8 +11,9 @@ Agents are Claude Code subagents, installed by symlinking into `~/.claude/agents
 ## File Conventions
 
 - **Agents** live in `agents/` and are named `[name].md`, matching the kebab-case `name` frontmatter field
-- **Skills** live in `skills/<name>/SKILL.md` (one subdirectory per skill, file always named `SKILL.md` — required for `npx skills` discovery). Skill frontmatter must include `name` and `description`.
-  - `.claude-plugin/plugin.json` lists every skill path under a `name` field so `skills list` groups them under a "Sleeyax Skills" header. The `skills` array is maintained manually — when adding or renaming a skill directory, update `.claude-plugin/plugin.json` too, or the new skill won't be grouped.
+- **Skills** live in `skills/<category>/<name>/SKILL.md` (one subdirectory per skill, grouped under a category folder, file always named `SKILL.md` — required for `npx skills` discovery). Skill frontmatter must include `name` and `description`.
+  - Categories are `delegation`, `frontend`, `git`, `implementation`, `planning`, `review`, `setup`, and `utils`. They organise the repo only — skill names stay flat and globally unique, since the `skills` CLI installs them by `name`, not by path.
+  - `.claude-plugin/plugin.json` lists every skill path under a `name` field so `skills list` groups them under a "Sleeyax Skills" header. The `skills` array is maintained manually — when adding, moving, or renaming a skill directory, update `.claude-plugin/plugin.json` too, or the new skill won't be grouped.
 - Agents use YAML frontmatter with fields: `name`, `description`, and optionally `tools` and `model`
 - `tools` is a comma-separated list of Claude Code tool names (e.g., `Read, Edit`); omit it to inherit all tools
 - Agent bodies must stay Codex-compatible: the Codex install script extracts frontmatter with line-based parsing, so keep `name` and `description` on single lines
