@@ -7,6 +7,29 @@ My collection of skills for day-to-day agentic coding.
 
 ## Installation
 
+Pick one of two routes: the Claude Code plugin or the `skills` CLI (plus optional agent symlinks). 
+
+### Claude Code plugin
+
+This repo doubles as a Claude Code marketplace containing a single plugin, `sleeyax-skills`, that bundles every skill and both agents:
+
+```bash
+claude plugin marketplace add sleeyax/skills
+claude plugin install sleeyax-skills@sleeyax
+
+# update (no version is pinned, so every new commit counts as a new version)
+claude plugin marketplace update sleeyax
+claude plugin update sleeyax-skills@sleeyax
+
+# uninstall
+claude plugin uninstall sleeyax-skills@sleeyax
+claude plugin marketplace remove sleeyax
+```
+
+The same thing works in-session via `/plugin marketplace add sleeyax/skills` and `/plugin install sleeyax-skills@sleeyax`.
+
+To inspect what you got (component inventory and token cost): `claude plugin details sleeyax-skills`.
+
 ### Skills
 
 Skills are reusable markdown instructions that agents like Claude Code load on demand to handle a specific task or workflow.
@@ -41,7 +64,7 @@ Agents are custom subagents that the main agent can delegate specialized tasks t
 
 #### Claude Code
 
-Claude Code discovers agents in `~/.claude/agents/`:
+The plugin already ships both agents, so this step is only for a non-plugin install. Claude Code discovers agents in `~/.claude/agents/`:
 
 ```bash
 # create the agents directory if it doesn't exist
@@ -94,6 +117,6 @@ Rerun the script after editing the tracked settings file.
 Recommended plugins:
 
 ```bash
-claude plugins add frontend-design@claude-plugins-official
-claude plugins add context7@claude-plugins-official
+claude plugin install frontend-design@claude-plugins-official
+claude plugin install context7@claude-plugins-official
 ```

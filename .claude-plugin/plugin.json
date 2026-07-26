@@ -1,5 +1,19 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "sleeyax-skills",
+  "displayName": "Sleeyax Skills",
+  "description": "Sleeyax's skills and agents for day-to-day agentic coding — planning, refining, delegation, git, review, and setup workflows.",
+  "author": {
+    "name": "Sleeyax",
+    "url": "https://github.com/sleeyax"
+  },
+  "homepage": "https://github.com/sleeyax/skills",
+  "repository": "https://github.com/sleeyax/skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "agents"
+  ],
   "skills": [
     "./skills/delegation/agent-brief",
     "./skills/delegation/dispatch",

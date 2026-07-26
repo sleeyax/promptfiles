@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "sleeyax",
+  "owner": {
+    "name": "Sleeyax",
+    "url": "https://github.com/sleeyax"
+  },
+  "description": "Sleeyax's skills and agents for day-to-day agentic coding, as an installable Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "sleeyax-skills",
+      "source": "./",
+      "description": "Sleeyax's skills and agents for day-to-day agentic coding.",
+      "category": "engineering",
+      "keywords": [
+        "skills",
+        "agents",
+        "planning",
+        "code-review",
+        "git",
+        "productivity"
+      ]
+    }
+  ]
+}
