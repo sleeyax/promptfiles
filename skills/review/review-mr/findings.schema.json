@@ -4,6 +4,20 @@
   "type": "object",
   "required": ["diffRefs", "findings"],
   "additionalProperties": false,
+  "$defs": {
+    "linePoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "newLine": { "type": ["integer", "null"], "minimum": 1 },
+        "oldLine": { "type": ["integer", "null"], "minimum": 1 }
+      },
+      "anyOf": [
+        { "required": ["newLine"], "properties": { "newLine": { "type": "integer" } } },
+        { "required": ["oldLine"], "properties": { "oldLine": { "type": "integer" } } }
+      ]
+    }
+  },
   "properties": {
     "diffRefs": {
       "type": "object",
@@ -35,7 +49,16 @@
           "oldPath":  { "type": "string", "minLength": 1 },
           "line":     { "type": "integer", "minimum": 1 },
           "title":    { "type": "string" },
-          "body":     { "type": "string", "minLength": 1 }
+          "body":     { "type": "string", "minLength": 1 },
+          "lineRange": {
+            "type": "object",
+            "required": ["start", "end"],
+            "additionalProperties": false,
+            "properties": {
+              "start": { "$ref": "#/$defs/linePoint" },
+              "end":   { "$ref": "#/$defs/linePoint" }
+            }
+          }
         }
       }
     }
