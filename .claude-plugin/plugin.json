@@ -28,6 +28,7 @@
     "./skills/planning/refine",
     "./skills/planning/refine-issue",
     "./skills/review/address-review",
+    "./skills/review/human-review",
     "./skills/review/review-changes",
     "./skills/review/review-mr",
     "./skills/setup/claude-settings",
