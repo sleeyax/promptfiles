@@ -17,14 +17,12 @@
   "skills": [
     "./skills/delegation/agent-brief",
     "./skills/delegation/dispatch",
-    "./skills/delegation/handoff",
     "./skills/frontend/suggest-icon",
     "./skills/frontend/tailwind-v3-compat",
     "./skills/git/git-branch",
     "./skills/git/git-commit",
     "./skills/implementation/implement",
     "./skills/planning/brainstorm",
-    "./skills/planning/domain-modeling",
     "./skills/planning/refine",
     "./skills/planning/refine-issue",
     "./skills/review/address-review",
@@ -32,7 +30,6 @@
     "./skills/review/review-mr",
     "./skills/setup/claude-settings",
     "./skills/setup/init-agents",
-    "./skills/setup/setup-pre-commit",
     "./skills/utils/phase",
     "./skills/utils/question"
   ]

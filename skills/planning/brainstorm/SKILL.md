@@ -26,7 +26,7 @@ This is the *divergent* half. It widens the idea — finds the edge cases, the s
 
 Search the codebase before asking the user anything the code can answer. Does something like this already exist, whole or in part, possibly under another name? What would the change touch? Who calls it today?
 
-If `CONTEXT.md` or `CONTEXT-MAP.md` exists at the repository root, read it so the session speaks the project's language, and use the [domain-modeling](../domain-modeling/SKILL.md) skill throughout — challenge fuzzy terms as they come up and record what crystallises.
+If `CONTEXT.md` or `CONTEXT-MAP.md` exists at the repository root, read it so the session speaks the project's language, and use the `domain-modeling` skill throughout, if it is available — challenge fuzzy terms as they come up and record what crystallises.
 
 ### 2. Frame the problem
 

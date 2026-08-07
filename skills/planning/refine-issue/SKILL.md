@@ -55,7 +55,7 @@ Explore read-only, to make the brief concrete:
 
 - Locate the code the issue is actually about. Note the real types, function signatures, and config shapes involved — the brief names these, not file paths.
 - Check whether it's **already implemented**. Search by domain concept, not just the issue's wording. If it already exists, say where and ask whether to continue.
-- If `CONTEXT.md` or `CONTEXT-MAP.md` exists at the repository root, domain modeling is set up for this repo: read the glossary and use the [domain-modeling](../domain-modeling/SKILL.md) skill from here on, so the brief speaks the project's language. Terms sharpened while refining get written back to `CONTEXT.md` as they resolve — that's the one place this skill touches the working tree, and step 7 reports it.
+- If `CONTEXT.md` or `CONTEXT-MAP.md` exists at the repository root, domain modeling is set up for this repo: read the glossary and use the `domain-modeling` skill from here on, if it is available, so the brief speaks the project's language. Terms sharpened while refining get written back to `CONTEXT.md` as they resolve — that's the one place this skill touches the working tree, and step 7 reports it.
 
 ### 4. Report the gaps
 
