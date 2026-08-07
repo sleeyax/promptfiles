@@ -10,6 +10,30 @@ Agents are Claude Code subagents, installed by symlinking into `~/.claude/agents
 
 The repo also doubles as a Claude Code marketplace hosting one plugin, `sleeyax-skills@sleeyax`, that bundles every skill and both agents. See [Plugin manifests](#plugin-manifests).
 
+## Managing the local install
+
+Prefer the `skills` CLI for anything that changes what is installed on the user's machine.
+Global installs live in `~/.agents/skills/<name>/`, and each agent directory symlinks to them.
+
+```bash
+npx skills list -g                          # what is installed globally
+npx skills add . -s '*'                     # install every skill from this working copy
+npx skills add . -l                         # list what's installable here, without installing
+npx skills update -g                        # pull the latest versions
+npx skills remove --global <name>... -y     # uninstall by skill name
+```
+
+Install from `.`, not from `sleeyax/skills` — the latter pulls the published GitHub copy and silently ignores uncommitted local work.
+
+`remove` and `add` are interactive by default, but the CLI detects it is running under an agent and falls back to a non-interactive run.
+Pass `-y` anyway so the command can't block.
+`-y` on `add` also skips the scope prompt and auto-detects, so pass `-g` alongside it when the target is the global install.
+
+If the CLI can't do the job — it's unavailable, the command fails, or the install is in a state it won't reconcile — edit `~/.agents/skills/` and the symlinks under `~/.claude/skills/` directly, and say that you did.
+Leave no dangling symlinks behind.
+
+Removing a skill from this repo does not touch an existing install, so uninstall it separately.
+
 ## File Conventions
 
 - **Agents** live in `agents/` and are named `[name].md`, matching the kebab-case `name` frontmatter field
