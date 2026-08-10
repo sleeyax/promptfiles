@@ -1,7 +1,8 @@
 ---
 name: brainstorm
-description: Shape a raw idea into a direction worth refining — ground it in the codebase, frame the problem, surface the angles and edge cases the user hasn't considered, and weigh candidate approaches. Use when the user has an idea but no plan yet.
+description: Shape a raw idea into a direction worth refining — ground it in the codebase, frame the problem, surface the angles and edge cases the user hasn't considered, and weigh candidate approaches.
 argument-hint: "The idea to brainstorm"
+disable-model-invocation: true
 ---
 
 # Brainstorm
