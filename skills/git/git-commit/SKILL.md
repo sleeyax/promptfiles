@@ -9,7 +9,7 @@ Suggest a commit message for the current changes and commit it after user confir
 
 ## Hard rules
 
-- **Never commit without an explicit user choice.** Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. This applies even when this workflow is invoked as the final phase of a parent workflow (e.g. `/implement`) — a parent workflow that "ends with a commit phase" is authorization to *propose* a commit, not to run `git commit` on the user's behalf.
+- **Never commit without an explicit user choice.** Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. The one waiver is a standing policy the user set earlier in the session that covers commits by name — the [phase](../../utils/phase/SKILL.md) skill's gate policy. A parent workflow that merely "ends with a commit phase" (e.g. `/implement`) is not that: it is authorization to *propose* a commit, not to run `git commit` on the user's behalf.
 - **Keep the context small.** This skill almost always runs at the end of a long session, where every extra round trip and every line of diff is re-sent along with the whole conversation. Gather in one call, bound the diff, and never re-run a command whose output you already have.
 
 ## Steps
