@@ -38,7 +38,7 @@ Removing a skill from this repo does not touch an existing install, so uninstall
 
 - **Agents** live in `agents/` and are named `[name].md`, matching the kebab-case `name` frontmatter field
 - **Skills** live in `skills/<category>/<name>/SKILL.md` (one subdirectory per skill, grouped under a category folder, file always named `SKILL.md` — required for `npx skills` discovery). Skill frontmatter must include `name` and `description`.
-  - Categories are `delegation`, `frontend`, `git`, `implementation`, `planning`, `review`, `setup`, and `utils`. They organise the repo only — skill names stay flat and globally unique, since the `skills` CLI installs them by `name`, not by path.
+  - Categories are `delegation`, `frontend`, `git`, `implementation`, `integrations`, `planning`, `review`, `setup`, and `utils`. They organise the repo only — skill names stay flat and globally unique, since the `skills` CLI installs them by `name`, not by path.
   - `.claude-plugin/plugin.json` lists every skill path, so both `skills list` and Claude Code's plugin loader pick them up. The `skills` array is maintained manually — when adding, moving, or renaming a skill directory, update it too, or the skill won't load.
 - Agents use YAML frontmatter with fields: `name`, `description`, and optionally `tools` and `model`
 - `tools` is a comma-separated list of Claude Code tool names (e.g., `Read, Edit`); omit it to inherit all tools
