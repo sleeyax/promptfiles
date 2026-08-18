@@ -14,11 +14,11 @@ This skill fetches the MR's context and places the comments. The reviewing itsel
 ## Hard rules
 
 - Never `publish` draft notes — leave them for the user.
-- Every gate — dirty-tree, diff-size, pre-submission — is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer.
+- Every gate — dirty-tree, no-checkout, diff-size, pre-submission — is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer.
 - Never push, commit, or modify the cwd repo's working tree without an explicit confirm.
 - Every finding cites a real `+` (added) line in the actual diff. Removed-line comments are out of scope.
 - Posting is gated by exactly one explicit confirm covering the whole batch.
-- Don't review the diff here. Delegate to `review-changes` and work from the findings it returns; the only exception is diff-only mode (no local checkout), where that skill can't run.
+- Don't review the diff here. Delegate to `review-changes` and work from the findings it returns; the only exception is diff-only mode, where that skill can't run — and the user has to pick it at the step 5 gate.
 - One defect is one draft note. `review-changes` merges and deduplicates before returning — never re-split a merged finding, and never post the same defect twice because both agents found it.
 - The agent writes **exactly one** `findings.json` per run (matching `findings.schema.json`) and invokes `post-draft-note.sh` **exactly once**. No per-finding shell calls. Rollback on partial failure is the helper's job.
 - GitLab MCP server first if available; fall back to `glab`. If neither, stop.
@@ -76,7 +76,12 @@ From this point, the diff source is **`git`, not the API**:
 - Per-file diff: `git diff <base_sha>...<head_sha> -- <path>` on demand, one path at a time.
 - File contents at HEAD: read the file directly from the working tree.
 
-If cwd is unrelated to the project, review from the API diff alone — fetch one file at a time via `glab api "projects/<id>/merge_requests/<iid>/diffs?page=N&per_page=1"`, never bulk. Note the diff-only limitation in the summary.
+If cwd is unrelated to the project, stop and ask before reviewing anything. Diff-only is a fallback, not a default, and this is the last point where getting a proper checkout is still cheap:
+
+- **Point me at a checkout** (Recommended) — the user gives the path to an existing clone. Verify its remote matches the MR's project, then run this step from the top there.
+- **Clone it** — `git clone` the project into a temp dir and continue from 5.1 there. Report the path in step 11 so the user can keep or delete it.
+- **Review diff-only anyway** — accept [diff-only mode](#7-review-the-diff). Say what it costs *before* they choose: one agent instead of two, diff hunks with no surrounding file, and no `review-changes`.
+- **Cancel** — exit without reviewing.
 
 ### 6. Diff-size guardrail
 
@@ -105,7 +110,7 @@ Then check each returned finding before it becomes a draft note:
 - Findings outside the reviewed path set are out of scope — drop them.
 - A `suggestion` becomes a `suggestion:-N+M` block in step 8 (`N` lines before the anchor, `M` after; `-0+0` = anchor only), with the original indentation preserved.
 
-**Diff-only mode.** `review-changes` reads the diff from `git`, so it needs the local checkout from step 5. If cwd is unrelated to the project, review here instead: walk the file list one path at a time via `glab api "projects/<id>/merge_requests/<iid>/diffs?page=N&per_page=1"`, read-only, holding nothing on disk, and produce the same finding shape yourself. Say in the summary that the review was single-agent and diff-only.
+**Diff-only mode.** `review-changes` reads the diff from `git`, so it needs the local checkout from step 5. Reached only when the user chose **Review diff-only anyway** at that step's gate; review here instead: walk the file list one path at a time via `glab api "projects/<id>/merge_requests/<iid>/diffs?page=N&per_page=1"`, read-only, holding nothing on disk, and produce the same finding shape yourself. Say in the summary that the review was single-agent and diff-only.
 
 ### 8. Build the in-memory findings list
 
