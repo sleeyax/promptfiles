@@ -1,6 +1,6 @@
 ---
 name: review-changes
-description: Review the current branch's changes with a chosen reviewer (Codex CLI / Claude Code / other, whichever harness you're in), then fix simple findings in their own commits. Use when the user wants to self-review code before pushing, or asks to review a branch. For posting a GitLab MR review use review-mr instead.
+description: Review the current branch's changes with one or more reviewers, then fix simple findings in their own commits. Use when the user wants to self-review code before pushing, or asks to review a branch. For posting a GitLab MR review use review-mr instead.
 ---
 
 # Review Changes
@@ -9,12 +9,15 @@ Scope: $ARGUMENTS
 
 Review the current branch's changes with a user-chosen reviewer, then fix the **simple, unambiguous** findings in their own commits so the branch lands in a ready-to-review state before it's pushed. Anything that needs human judgement is reported, not fixed.
 
-The skill runs in whichever harness the user invoked it from (Claude Code, Codex, …) and offers the reviewers that harness can actually drive. The chosen reviewer is read-only — either an in-process subagent or a CLI subprocess. This skill's agent is the **only editor** — it triages the findings and applies the fixes itself.
+By default the review runs **two reviewers simultaneously** — Codex and Claude Code — because different models catch different things. Their reports are merged into one deduplicated verdict before triage.
+
+The skill runs in whichever harness the user invoked it from (Claude Code, Codex, …) and offers the reviewers that harness can actually drive. Every reviewer is read-only — either an in-process subagent or a CLI subprocess. This skill's agent is the **only editor** — it triages the findings and applies the fixes itself.
 
 ## Hard rules
 
-- The review step is read-only. Only this skill's agent edits files, and only after the step 6 apply gate.
-- Auto-fix **only** localized, unambiguous findings (see step 5). Report everything else for the human reviewer — never silently make architectural, security-sensitive, behaviour-changing, or judgement-call edits.
+- The review step is read-only. Only this skill's agent edits files, and only after the step 7 apply gate.
+- Reviewers run independently. Never feed one reviewer's findings to the other, and never let one wait on the other — the value is in two uncorrelated opinions.
+- Auto-fix **only** localized, unambiguous findings (see step 6). Report everything else for the human reviewer — never silently make architectural, security-sensitive, behaviour-changing, or judgement-call edits.
 - Every gate — reviewer choice, apply, dirty-tree, re-review — is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer. Commits go through the `git-commit` skill's own gate.
 - Never push. The user pushes manually.
 - Don't dump the full diff into a prompt or hand it to the reviewer as one blob. Give the reviewer the base ref and let it run `git diff` / read files itself.
@@ -56,25 +59,27 @@ You already know this: your own system prompt names the harness you're running i
 
 It decides how a reviewer is launched — in **Claude Code** the Claude reviewer is an in-process subagent; in **Codex** both reviewers run as CLI subprocesses (`codex review`, `claude -p`).
 
-Then check which reviewer CLIs are installed — `command -v codex claude` — so step 3 only offers what can actually run.
+Then check which reviewer CLIs are installed — `command -v codex claude` — so step 3 only offers what can actually run. The default **Both** option needs every CLI its harness drives: the Codex CLI in Claude Code, and both CLIs in Codex.
 
 ### 3. Choose the reviewer
 
-Ask — "Review changes?". The options depend on the harness from step 2; recommend the *other* harness, so the review is a genuine second opinion rather than the same model re-reading its own work.
+Ask — "Review changes?". Default to **Both**: two models reviewing the same diff independently catch noticeably more than either alone, and agreement between them is itself a signal. The single-reviewer options stay available for a quicker, cheaper pass.
 
 In **Claude Code**:
 
-- **Codex** (Recommended) — Codex CLI, default model.
+- **Both** (Recommended) — Codex CLI and a read-only Claude review subagent, run simultaneously.
+- **Codex** — Codex CLI, default model.
 - **Claude Code** — a read-only review subagent, default model.
-- **Other** — free-form: the user names a harness + model (e.g. `claude code sonnet`, `codex gpt-5-codex`).
 - **Skip** — exit cleanly without reviewing.
 
 In **Codex**:
 
-- **Claude Code** (Recommended) — `claude -p`, default model.
+- **Both** (Recommended) — `claude -p` and a nested `codex review`, run simultaneously.
+- **Claude Code** — `claude -p`, default model.
 - **Codex** — a nested `codex review` subprocess, default model.
-- **Other** — free-form, as above.
 - **Skip** — exit cleanly without reviewing.
+
+`AskUserQuestion`'s built-in **Other** entry covers the free-form case: the user names a harness + model (e.g. `claude code sonnet`, `codex gpt-5-codex`). Where that tool isn't available, list **Other** as a fifth numbered option.
 
 Drop any option whose CLI is missing, and say why it's missing. If only **Skip** remains, report that and stop.
 
@@ -93,22 +98,45 @@ Route by the choice. Give every reviewer the quality bar below, plus the base re
   ```
 
   Add `--model <model>` when one was named. Capture stdout as the findings report.
+- **Both** → start the two routes above for the current harness at the same time, then wait for both:
+  - In **Claude Code**: spawn the review subagent in the background and launch `codex review` as a backgrounded Bash command in the *same* message, so neither blocks the other, then collect both reports.
+  - In **Codex**: run both CLIs as concurrent background jobs writing to temp files, and `wait`:
+
+    ```sh
+    out_codex=$(mktemp); out_claude=$(mktemp)
+    codex review --base <base> >"$out_codex" 2>&1 &
+    claude -p --allowed-tools "..." --disallowed-tools "..." "<review prompt>" >"$out_claude" 2>&1 &
+    wait
+    ```
 - **Other** → parse the input: `claude` / `claude code` family → the Claude Code route for the current harness with that model; `codex` family → `codex review -m <model> --base <base>`. An unrecognized harness → ask the user for the exact non-interactive, read-only review command to run.
 
-If the reviewer fails (non-zero exit, missing or unauthenticated CLI), surface its stderr, suggest the likely fix (e.g. `codex login`, `claude login`), and offer to pick a different reviewer. Do not silently fall back to reviewing inline.
+If a reviewer fails (non-zero exit, missing or unauthenticated CLI), surface its stderr and suggest the likely fix (e.g. `codex login`, `claude login`). With **Both**, keep going on the surviving reviewer's report and say the review is single-sourced; if it was the only reviewer, offer to pick a different one. Do not silently fall back to reviewing inline.
 
 **Quality bar:** concrete bugs, correctness issues, security problems, and maintainability risks *introduced by these changes* — cite file + line, verify against the actual files, no speculation. Nits/style are allowed but flagged low.
 
-### 5. Triage the findings
+### 5. Merge the reports
 
-Split every finding into one of two buckets:
+Skip this when only one reviewer ran. Otherwise fold both reports into a single verdict — the two will overlap, and the same bug reported twice must not become two findings, two fixes, or two commits.
+
+Two findings are the same when they describe the same defect in the same place: same file and same root cause, even if the line numbers drift, the severities disagree, or the wording is entirely different. Merge those into one entry — keep the clearer explanation and the more precise location, take the higher severity, and tag it with the reviewers that raised it.
+
+- Sort agreed findings first. Both reviewers landing on the same defect is the strongest signal in the report; say so.
+- A finding only one reviewer raised is not weaker evidence, just unconfirmed — these are often the most valuable ones. Verify it against the file yourself, and drop it only if verification shows it's plainly wrong, noting what you dropped and why.
+- Never merge two distinct defects because they share a file, and never merge a specific finding into a vaguer one that happens to overlap it.
+- When the two reviewers propose *contradictory* fixes for one defect, keep both proposals on the entry and treat it as complex/uncertain in step 6 unless one is obviously correct.
+
+Print the merged list with a source tag per finding — `[both]`, `[codex]`, `[claude]` — and state the raw and merged counts (e.g. "14 findings from 2 reviewers → 9 unique, 5 agreed").
+
+### 6. Triage the findings
+
+Split every finding from the merged list into one of two buckets:
 
 - **Simple / safe (auto-fixable)** — one obvious correct fix, confined to lines/files already in the diff, with no behaviour/API/design change and no new dependency (e.g. null check, off-by-one, wrong variable, missing `await`, obvious resource leak, logic typo).
 - **Complex / uncertain (leave for the reviewer)** — architectural, security-sensitive, ambiguous, behaviour-changing, or otherwise a judgement call.
 
 Print a numbered list. For each finding show its bucket, location, and — for the simple ones — the proposed fix.
 
-### 6. Apply the fixes
+### 7. Apply the fixes
 
 First, if the working tree is dirty, ask: **Stash** (restore after) / **Proceed anyway** / **Report only** — so per-finding fix commits stay clean.
 
@@ -116,20 +144,20 @@ Then ask: **Apply proposed fixes** / **Pick a subset** / **Report only (no chang
 
 On apply: edit only the chosen simple findings. Keep the change tight to each finding — no unrelated refactors — and confirm each fix is actually correct.
 
-### 7. Commit the fixes
+### 8. Commit the fixes
 
 One commit per finding, grouped only when a few fixes clearly belong together. For each commit, invoke the [git-commit](../git-commit/SKILL.md) skill (its confirmation gate applies). These commits land **after** the existing branch commits.
 
-### 8. Offer a re-review
+### 9. Offer a re-review
 
 Ask: **Re-review** (run another pass from step 3, to confirm the fixes are clean and catch anything new) / **Finish**.
 
-### 9. Report
+### 10. Report
 
 Summarize:
 
 - The base branch the review ran against.
-- Reviewer + model used, and how it ran (in-process subagent or CLI).
-- Counts: findings found / fixed / left for the reviewer.
+- Each reviewer + model used, and how it ran (in-process subagent or CLI).
+- Counts: raw findings per reviewer / unique after merging / agreed by both / fixed / left for the reviewer.
 - The fix commit SHAs.
 - The list of complex/uncertain findings the human reviewer should still address.
