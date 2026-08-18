@@ -1,17 +1,19 @@
 ---
 name: review-changes
-description: Review the current branch's changes with one or more reviewers, then fix simple findings in their own commits. Use when the user wants to self-review code before pushing, or asks to review a branch. For posting a GitLab MR review use review-mr instead.
+description: Review a set of changes with one or more reviewers, then fix simple findings in their own commits. Use when the user wants to self-review code before pushing, or asks to review a branch. Other skills call this one in report-only mode to do their reviewing for them. For posting a GitLab MR review use review-mr instead.
 ---
 
 # Review Changes
 
 Scope: $ARGUMENTS
 
-Review the current branch's changes with a user-chosen reviewer, then fix the **simple, unambiguous** findings in their own commits so the branch lands in a ready-to-review state before it's pushed. Anything that needs human judgement is reported, not fixed.
+Review a set of changes — the current branch's commits unless told otherwise — with a user-chosen reviewer, then fix the **simple, unambiguous** findings in their own commits so the branch lands in a ready-to-review state before it's pushed. Anything that needs human judgement is reported, not fixed.
 
 By default the review runs **two reviewers simultaneously** — Codex and Claude Code — because different models catch different things. Their reports are merged into one deduplicated verdict before triage.
 
 The skill runs in whichever harness the user invoked it from (Claude Code, Codex, …) and offers the reviewers that harness can actually drive. Every reviewer is read-only — either an in-process subagent or a CLI subprocess. This skill's agent is the **only editor** — it triages the findings and applies the fixes itself.
+
+It's also the reviewing engine other skills call instead of rolling their own — see [Report-only mode](#report-only-mode).
 
 ## Hard rules
 
@@ -22,6 +24,26 @@ The skill runs in whichever harness the user invoked it from (Claude Code, Codex
 - Never push. The user pushes manually.
 - Don't dump the full diff into a prompt or hand it to the reviewer as one blob. Give the reviewer the base ref and let it run `git diff` / read files itself.
 - Never spawn a reviewer that can edit: an in-process subagent gets read-only tools, and a reviewer CLI is launched with its write tools denied. A reviewer that can't be constrained is not an option — pick another one.
+
+## Report-only mode
+
+Another skill can call this one to do its reviewing — [review-mr](../review-mr/SKILL.md) does, to review a merge request's diff. Run steps 1–5 and hand the result back; **stop there**. No triage, no edits, no commits, no re-review gate, and no dirty-tree gate (nothing is being written).
+
+The caller passes `report-only` in `$ARGUMENTS` along with the scope, and gets back:
+
+- the merged, deduplicated findings in the shape below,
+- each reviewer's name + model and how it ran,
+- the raw per-reviewer and merged counts.
+
+## Finding shape
+
+Every reviewer is asked for the same shape, so findings from two of them can be compared, merged, and handed to a caller:
+
+- `severity` — `blocker`, `concern`, `suggestion`, or `nit`
+- `file` + `line` — a line the change actually touches
+- `title` — ≤10 words, stated as a fact
+- `explanation` — 2–4 sentences: problem, trigger, consequence, fix
+- `suggestion` (optional) — a replacement snippet for those lines
 
 ## Workflow
 
@@ -50,7 +72,10 @@ The skill runs in whichever harness the user invoked it from (Claude Code, Codex
 4. Default scope is the branch's committed changes vs the base: `<base>...HEAD`.
 5. `$ARGUMENTS` may override:
    - a branch name → use it as the base, skipping the detection above.
+   - a commit range (`<a>...<b>`, `<a>..<b>`, or two SHAs) → use it as the scope verbatim, skipping the detection above.
    - `uncommitted` → review staged + unstaged + untracked changes instead.
+   - `-- <path> …` → restrict the review to those paths.
+   - `report-only` → [report-only mode](#report-only-mode).
 6. If there's no diff in scope, report that there's nothing to review and stop.
 
 ### 2. Identify the current harness
@@ -112,7 +137,7 @@ Route by the choice. Give every reviewer the quality bar below, plus the base re
 
 If a reviewer fails (non-zero exit, missing or unauthenticated CLI), surface its stderr and suggest the likely fix (e.g. `codex login`, `claude login`). With **Both**, keep going on the surviving reviewer's report and say the review is single-sourced; if it was the only reviewer, offer to pick a different one. Do not silently fall back to reviewing inline.
 
-**Quality bar:** concrete bugs, correctness issues, security problems, and maintainability risks *introduced by these changes* — cite file + line, verify against the actual files, no speculation. Nits/style are allowed but flagged low.
+**Quality bar:** concrete bugs, correctness issues, security problems, and maintainability risks *introduced by these changes* — cite file + line, verify against the actual files, no speculation. Nits and style are in scope, at `nit` severity. Every reviewer returns its findings in the [finding shape](#finding-shape).
 
 ### 5. Merge the reports
 
@@ -125,7 +150,7 @@ Two findings are the same when they describe the same defect in the same place: 
 - Never merge two distinct defects because they share a file, and never merge a specific finding into a vaguer one that happens to overlap it.
 - When the two reviewers propose *contradictory* fixes for one defect, keep both proposals on the entry and treat it as complex/uncertain in step 6 unless one is obviously correct.
 
-Print the merged list with a source tag per finding — `[both]`, `[codex]`, `[claude]` — and state the raw and merged counts (e.g. "14 findings from 2 reviewers → 9 unique, 5 agreed").
+Print the merged list with a source tag per finding — `[both]`, `[codex]`, `[claude]` — and state the raw and merged counts (e.g. "14 findings from 2 reviewers → 9 unique, 5 agreed"). In report-only mode this list is the return value: hand it back and stop.
 
 ### 6. Triage the findings
 

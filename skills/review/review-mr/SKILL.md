@@ -9,6 +9,8 @@ MR: $ARGUMENTS
 
 Review a GitLab MR like a senior engineer on the team and post findings as **draft** notes so the user publishes/discards manually.
 
+This skill fetches the MR's context and places the comments. The reviewing itself is delegated to the [review-changes](../review-changes/SKILL.md) skill in report-only mode, which picks the reviewers (two agents by default), runs them, and returns one merged, deduplicated set of findings.
+
 ## Hard rules
 
 - Never `publish` draft notes — leave them for the user.
@@ -16,6 +18,8 @@ Review a GitLab MR like a senior engineer on the team and post findings as **dra
 - Never push, commit, or modify the cwd repo's working tree without an explicit confirm.
 - Every finding cites a real `+` (added) line in the actual diff. Removed-line comments are out of scope.
 - Posting is gated by exactly one explicit confirm covering the whole batch.
+- Don't review the diff here. Delegate to `review-changes` and work from the findings it returns; the only exception is diff-only mode (no local checkout), where that skill can't run.
+- One defect is one draft note. `review-changes` merges and deduplicates before returning — never re-split a merged finding, and never post the same defect twice because both agents found it.
 - The agent writes **exactly one** `findings.json` per run (matching `findings.schema.json`) and invokes `post-draft-note.sh` **exactly once**. No per-finding shell calls. Rollback on partial failure is the helper's job.
 - GitLab MCP server first if available; fall back to `glab`. If neither, stop.
 - **Never dump the full diff to a file or to chat, or hand it to a subagent as one blob.** When the cwd repo matches the MR, read the diff incrementally from `git` (per-file, on demand) — not from `glab api .../diffs`. The API `diffs` endpoint is only used when there is no local checkout, and even then read it page-by-page, one file at a time, never as one bulk write. To measure size up front, use `/merge_requests/<iid>/changes` (metadata + per-file stats), not `/diffs`. This rule still holds when the user picks **Review whole diff anyway** — that answer authorizes the *scope*, not bulk-dumping.
@@ -81,19 +85,27 @@ Using only the file list + stats from step 4 (no full diff text needed), if the 
 - **Review whole diff anyway**
 - **Cancel**
 
-The chosen subset is the only set of paths the agent will pull diffs for in step 7.
+The chosen subset is the only set of paths the reviewers will pull diffs for in step 7.
 
-### 7. Perform the review
+### 7. Review the diff
 
-Senior-engineer mindset. Walk the file list (or the user-picked subset) **one path at a time**:
+Invoke the [review-changes](../review-changes/SKILL.md) skill in report-only mode. It owns everything about the review — which reviewers run (two agents by default), running them simultaneously, the read-only constraints, and merging their findings into one deduplicated set. Pass it:
 
-- For each path, pull its diff on demand (`git diff <base_sha>...<head_sha> -- <path>` if checked out, else one paginated API call) and read the file from the working tree to confirm context.
-- Read-only inspection. No commands, no installs, no writes.
-- **Never write the diff or any file's full contents to disk.** Hold what you need in working memory; move on once a file is reviewed.
-- Nits, style suggestions, naming, and small refactors are allowed; flag at the appropriate severity.
-- Each finding cites a concrete `+` line — or contiguous `+` line range — in the new file.
-- Multi-line ranges use the `-N+M` span on the `suggestion` block (`N` lines before anchor, `M` after; `-0+0` = anchor only).
-- Severity tiers (metadata only — never mentioned in the body): `blocker`, `concern`, `suggestion`, `nit`.
+- `report-only`
+- the scope: `<base_sha>...<head_sha>`
+- `-- <path> …` when step 6 narrowed the file set
+
+It returns the merged findings in its finding shape (`severity`, `file`, `line`, `title`, `explanation`, optional `suggestion`), the reviewers + models it used, and the raw per-reviewer and merged counts. Keep all of it — the counts and reviewer names go in the summary note. Don't re-review the diff yourself, and don't re-litigate its merge decisions.
+
+Its severity vocabulary — `blocker`, `concern`, `suggestion`, `nit` — is the one this skill posts with, so it carries over unchanged.
+
+Then check each returned finding before it becomes a draft note:
+
+- The anchor must be a real `+` (added) line in this MR's diff. Re-anchor it to the right added line if it's off; drop the finding if it has no added line to attach to, and say so.
+- Findings outside the reviewed path set are out of scope — drop them.
+- A `suggestion` becomes a `suggestion:-N+M` block in step 8 (`N` lines before the anchor, `M` after; `-0+0` = anchor only), with the original indentation preserved.
+
+**Diff-only mode.** `review-changes` reads the diff from `git`, so it needs the local checkout from step 5. If cwd is unrelated to the project, review here instead: walk the file list one path at a time via `glab api "projects/<id>/merge_requests/<iid>/diffs?page=N&per_page=1"`, read-only, holding nothing on disk, and produce the same finding shape yourself. Say in the summary that the review was single-agent and diff-only.
 
 ### 8. Build the in-memory findings list
 
@@ -109,7 +121,7 @@ For each finding, fill the `body` field by rendering `COMMENT_TEMPLATE.md` (inli
 ### 9. Pre-submission review loop
 
 1. Print numbered list to chat:
-   - `[N] <severity> · <path>:<line> · <title>` + 1-line body preview
+   - `[N] <severity> · <path>:<line> · <title>` + 1-line body preview, carrying over the reviewer tag `review-changes` returned — `[both]`, `[codex]`, `[claude]` — plus its raw and merged counts (e.g. "14 findings from 2 reviewers → 9 unique, 5 agreed").
    - Summary as `[S]`
 2. Ask: **Post all** / **Drop some** / **Edit some** / **Cancel**.
 3. **Drop some** → ask which numbers, remove them, loop back to step 1.
@@ -146,6 +158,7 @@ For each finding, fill the `body` field by rendering `COMMENT_TEMPLATE.md` (inli
 Print:
 - MR title + URL
 - `<mr_url>#drafts` direct link
+- Reviewers used + models, and how each ran (inline, in-process subagent, or CLI)
 - `posted` / `skipped` counts from the helper's success JSON
 - Reminder: review is **unpublished**. The user publishes or discards via the GitLab UI or `glab`.
 
