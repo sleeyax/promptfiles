@@ -1,5 +1,9 @@
 # Global guidance
 
+## Scope
+
+- Don't make changes if I am just asking questions. Answer, and let me decide what to do about it.
+
 ## Comments & commit messages
 
 - Well-named functions and obvious helpers or utilities don't need a comment narrating them; it's noise. Only add a comment to explain non-obvious _why_ (constraints, gotchas), not the _what_ of readable code.

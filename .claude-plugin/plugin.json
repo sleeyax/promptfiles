@@ -31,7 +31,6 @@
     "./skills/review/review-mr",
     "./skills/setup/claude-settings",
     "./skills/setup/init-agents",
-    "./skills/utils/phase",
-    "./skills/utils/question"
+    "./skills/utils/phase"
   ]
 }
