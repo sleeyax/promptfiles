@@ -1,36 +1,62 @@
 ---
 name: implement
-description: Implement a specific GitHub or GitLab issue end-to-end — fetch it, set up a branch, plan, implement, propose a commit, and review the result. Use when the user references an issue number/URL and wants it implemented.
+description: Implement a specific GitHub, GitLab, or Linear issue end-to-end — fetch it, set up a branch, plan, implement, propose a commit, and review the result. Use when the user references an issue number/URL/identifier and wants it implemented.
 ---
 
 # Implement Issue
 
 Issue: $ARGUMENTS
 
-Implement a specific issue from GitHub or GitLab. Example invocations: `/implement #1`, `/implement 2`.
+Implement a specific issue from GitHub, GitLab, or Linear. Example invocations: `/implement #1`, `/implement 2`, `/implement ENG-42`.
 
 ## Workflow
 
-### 1. Extract the Issue Number
+### 1. Extract the Issue Reference
 
-Parse the issue number from `$ARGUMENTS`. Strip any leading `#` and accept either form.
+Parse the issue reference from `$ARGUMENTS`. It identifies both the issue *and* the tracker it lives in:
 
-- `#3` → issue `3`
-- `4` → issue `4`
+- `#3` → issue `3` on the repo's git host
+- `4` → issue `4` on the repo's git host
+- `ENG-42` (letters, dash, digits) → Linear issue `ENG-42`
+- A `linear.app/…/issue/ENG-42/…` URL → Linear issue `ENG-42`
+- A GitHub or GitLab issue URL → that issue, on that host
 
-If no issue number was provided, ask the user for one before proceeding.
+If no issue reference was provided, ask the user for one before proceeding.
 
-### 2. Determine the Git Hosting Provider
+### 2. Determine the Tracker
 
-Run `git remote -v` to inspect the remote URLs. Match against the host:
+**If step 1 matched a Linear identifier or URL, the tracker is Linear** — skip the git remote check entirely. Linear is independent of where the code is hosted, so the remote says nothing about it.
+
+Otherwise, run `git remote -v` to inspect the remote URLs and match against the host:
 
 - Contains `github.com` → **GitHub**
 - Contains `gitlab.com` or any GitLab instance (e.g. self-hosted) → **GitLab**
-- Otherwise, ask the user which provider to use.
+- Otherwise, ask the user which tracker to use.
 
-Also extract the `owner/repo` (GitHub) or `group/project` (GitLab) path from the remote URL — you'll need it to fetch the issue.
+For GitHub/GitLab, also extract the `owner/repo` (GitHub) or `group/project` (GitLab) path from the remote URL — you'll need it to fetch the issue.
 
 ### 3. Fetch the Issue
+
+#### Linear
+
+The Linear MCP server is the only supported way to reach Linear — there is no CLI fallback, and no other tracker is a substitute.
+
+**If the Linear MCP tools are not in this session, stop before fetching anything** and run `claude mcp list` to find out why. A session binds its MCP tools at startup, so the two failure modes need different fixes:
+
+**Not configured** — no Linear server in the list. Adding one now cannot surface its tools in this session; it takes a restart. Tell the user to run `claude mcp add --transport http linear https://mcp.linear.app/mcp`, restart Claude Code, then re-run this skill — and stop the workflow. Offering to retry here would only fail again.
+
+**Configured but unusable** — the server is listed, but unauthenticated, failing its health check, or `⏸ Pending approval`. This is fixable in place, so ask how to proceed and wait for the answer:
+
+- **Retry** — the user fixes it via `/mcp` (authenticate / reconnect) or `claude mcp login <name>`; re-check for the tools and continue once they respond
+- **Abort** — stop the workflow here
+
+Keep looping on **Retry** until the tools work or the user aborts. If a retry reveals the server was never loaded into this session at all (pending approval usually means exactly that), say so and fall back to the restart path above.
+
+Never guess at the issue's contents, and never silently continue without it.
+
+With the tools available, fetch the issue by its identifier and read its title, description, state, labels, and comments.
+
+#### GitHub / GitLab
 
 Prefer the matching MCP server if one is available in the current session:
 
@@ -51,7 +77,9 @@ If both the MCP server and the CLI are unavailable, stop and tell the user what 
 3. **If already on a custom branch** (not the default), stay on it and move to step 5.
 4. **If on the default branch:**
    1. Run `git fetch origin` and then `git pull --ff-only` to bring it up to date.
-   2. Suggest a feature branch name derived from the issue title, following Conventional Commits style: `<type>/<kebab-case-summary>` (e.g. `feat/dark-mode-toggle`, `fix/login-redirect-loop`, `chore/bump-deps`). Pick the type from the issue's labels/content (`feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, etc.).
+   2. Suggest a feature branch name:
+      - **Linear**: use the branch name Linear itself suggests for the issue (the `gitBranchName` field / "copy branch name" value). It embeds the issue identifier, which is what lets Linear link the branch back to the issue.
+      - **GitHub / GitLab**: derive it from the issue title, following Conventional Commits style: `<type>/<kebab-case-summary>` (e.g. `feat/dark-mode-toggle`, `fix/login-redirect-loop`, `chore/bump-deps`). Pick the type from the issue's labels/content (`feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, etc.).
    3. Ask how to proceed and wait for the answer, with these options:
       - **Confirm** the suggested branch name
       - **Custom name** — supply their own branch name
@@ -88,4 +116,5 @@ Invoke the [review-changes](../review-changes/SKILL.md) skill to review the chan
 
 ## Notes
 
-- If the issue references other issues, PRs, or discussions, fetch them too when they're load-bearing for the implementation.
+- Every gate in this workflow — the Linear MCP retry/abort prompt, the branch choice, the commit confirmation — is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer.
+- If the issue references other issues, PRs, discussions, or (on Linear) parent/sub-issues, fetch them too when they're load-bearing for the implementation.
