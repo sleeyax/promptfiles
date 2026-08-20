@@ -8,7 +8,7 @@ This is a curated collection of AI skills and agent definitions. There are no bu
 
 Agents are Claude Code subagents, installed by symlinking into `~/.claude/agents/`; `scripts/install-codex-agents.sh` generates Codex TOML equivalents from the same markdown files. Skills (used as Claude Code's replacement for slash commands in this repo) are installed via the [`skills`](https://www.npmjs.com/package/skills) npm CLI.
 
-The repo also doubles as a Claude Code marketplace hosting one plugin, `sleeyax-skills@sleeyax`, that bundles every skill and both agents. See [Plugin manifests](#plugin-manifests).
+The repo also doubles as a Claude Code marketplace hosting one plugin, `sleeyax-skills@sleeyax`, that bundles every skill, both agents, and the output styles. See [Plugin manifests](#plugin-manifests).
 
 ## Managing the local install
 
@@ -34,6 +34,8 @@ Leave no dangling symlinks behind.
 
 Removing a skill from this repo does not touch an existing install, so uninstall it separately.
 
+The `skills` CLI does not handle output styles. Install those by symlinking `output-styles/` into `~/.claude/output-styles/`, or let the plugin ship them.
+
 ## File Conventions
 
 - **Agents** live in `agents/` and are named `[name].md`, matching the kebab-case `name` frontmatter field
@@ -43,12 +45,14 @@ Removing a skill from this repo does not touch an existing install, so uninstall
 - Agents use YAML frontmatter with fields: `name`, `description`, and optionally `tools` and `model`
 - `tools` is a comma-separated list of Claude Code tool names (e.g., `Read, Edit`); omit it to inherit all tools
 - Agent bodies must stay Codex-compatible: the Codex install script extracts frontmatter with line-based parsing, so keep `name` and `description` on single lines
+- **Output styles** live in `output-styles/[name].md` and are picked up by the plugin's default `output-styles/` scan, so they are not listed in `plugin.json` — keep them flat, one level deep. Frontmatter is `name`, `description`, and `keep-coding-instructions`, which must be `true` for any style that shapes tone or format while Claude is still coding, or Claude Code drops its built-in software engineering instructions. Never set `force-for-plugin`: it would impose the style on everyone who installs the plugin.
+  - `unslop.md` is vendored from [cursor/plugins](https://github.com/cursor/plugins/blob/main/pstack/skills/unslop/SKILL.md). Keep its body byte-identical to upstream so it can be re-synced; frontmatter is ours.
 
 ## Plugin manifests
 
 Two files in `.claude-plugin/` make the repo installable as a Claude Code plugin:
 
-- `plugin.json` — the plugin manifest. Its `skills` array is the authoritative list of skill directories, because the default `skills/` scan only looks one level deep and this repo nests skills under category folders. Agents are *not* listed: the default `agents/` scan finds them, and listing individual agent files here makes Claude Code load none of them, since the marketplace entry's `source` is the repo root.
+- `plugin.json` — the plugin manifest. Its `skills` array is the authoritative list of skill directories, because the default `skills/` scan only looks one level deep and this repo nests skills under category folders. Agents are *not* listed: the default `agents/` scan finds them, and listing individual agent files here makes Claude Code load none of them, since the marketplace entry's `source` is the repo root. Output styles are not listed either, for the same reason.
 - `marketplace.json` — the marketplace catalog, with one entry pointing at `./`.
 
 No `version` is set in either file, so Claude Code falls back to the git commit SHA and users get updates on every commit. Adding a `version` would pin the plugin until it's bumped.

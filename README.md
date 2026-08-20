@@ -87,6 +87,22 @@ Codex expects agents as TOML files in `~/.codex/agents/`, so they can't be symli
 
 Rerun the script after editing an agent file.
 
+### Output styles
+
+Output styles are appended to Claude Code's system prompt and shape how it writes for the whole session. `output-styles/unslop.md` is vendored from the `pstack` plugin in [cursor/plugins](https://github.com/cursor/plugins/blob/main/pstack/skills/unslop/SKILL.md), where it ships as an always-on skill; only the frontmatter differs, so it can be re-synced from upstream.
+
+The plugin ships them via the default `output-styles/` scan. For a non-plugin install, symlink into `~/.claude/output-styles/`:
+
+```bash
+mkdir -p ~/.claude/output-styles/
+stow -t ~/.claude/output-styles/ output-styles
+
+# to uninstall:
+# stow -D -t ~/.claude/output-styles/ output-styles
+```
+
+Selecting one is a separate step from installing it: run `/config` and pick it under **Output style**, or set `outputStyle` in your settings. It takes effect on the next session.
+
 ## Harnesses
 
 ### Claude Code
