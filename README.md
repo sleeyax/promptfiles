@@ -89,7 +89,10 @@ Rerun the script after editing an agent file.
 
 ### Output styles
 
-Output styles are appended to Claude Code's system prompt and shape how it writes for the whole session. `output-styles/unslop.md` is vendored from the `pstack` plugin in [cursor/plugins](https://github.com/cursor/plugins/blob/main/pstack/skills/unslop/SKILL.md), where it ships as an always-on skill; only the frontmatter differs, so it can be re-synced from upstream.
+Output styles are appended to Claude Code's system prompt and shape how it writes for the whole session.
+
+- `eli5.md` — small words, short paragraphs, and at most two options when something has to be decided.
+- `unslop.md` — cuts AI tells from any writing. Vendored from the `pstack` plugin in [cursor/plugins](https://github.com/cursor/plugins/blob/main/pstack/skills/unslop/SKILL.md), where it ships as an always-on skill; only the frontmatter differs, so it can be re-synced from upstream.
 
 The plugin ships them via the default `output-styles/` scan. For a non-plugin install, symlink into `~/.claude/output-styles/`:
 
