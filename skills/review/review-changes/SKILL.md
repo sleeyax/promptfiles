@@ -1,6 +1,6 @@
 ---
 name: review-changes
-description: Review a set of changes with one or more reviewers, then fix simple findings in their own commits. Use when the user wants to self-review code before pushing, or asks to review a branch. Other skills call this one in report-only mode to do their reviewing for them. For posting a GitLab MR review use review-mr instead.
+description: Review a branch's committed changes with two independent reviewers, then auto-commit only the trivial fixes. Use when the user explicitly asks to review a branch or self-review before pushing. Do not use just because code was written or edited, and do not use for reviewing a single file on request. For posting a GitLab MR review use review-mr instead.
 ---
 
 # Review Changes
