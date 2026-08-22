@@ -109,11 +109,13 @@ Selecting one is a separate step from installing it: run `/config` and pick it u
 
 ## Harnesses
 
+`harnesses/AGENTS.md` holds my global instructions, shared by every harness. Each harness picks it up its own way, so install both the shared file and the harness-specific glue below.
+
 ### Claude Code
 
 #### CLAUDE.md
 
-`harnesses/claude/CLAUDE.md` holds my global Claude Code user instructions. Symlink it so it applies across all devices:
+`harnesses/claude/CLAUDE.md` is a one-line `@../AGENTS.md` import, so the shared instructions come along with it. Symlink it so it applies across all devices:
 
 ```bash
 ln -s $(pwd)/harnesses/claude/CLAUDE.md ~/.claude/CLAUDE.md
@@ -150,4 +152,17 @@ Recommended plugins:
 ```bash
 claude plugin install frontend-design@claude-plugins-official
 claude plugin install context7@claude-plugins-official
+```
+
+### Codex
+
+#### AGENTS.md
+
+Codex reads global instructions from `~/.codex/AGENTS.md`, so the shared file needs no conversion — the script symlinks it straight in. It refuses to overwrite a real file there, and honours `CODEX_HOME`.
+
+```bash
+./scripts/install-codex-settings.sh
+
+# to uninstall:
+# rm ~/.codex/AGENTS.md
 ```
