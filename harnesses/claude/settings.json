@@ -23,6 +23,10 @@
   "disableBundledSkills": true,
   "disableWorkflows": true,
   "disableArtifact": true,
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,

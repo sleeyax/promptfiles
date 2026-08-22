@@ -132,6 +132,17 @@ ln -s $(pwd)/harnesses/claude/CLAUDE.md ~/.claude/CLAUDE.md
 
 Rerun the script after editing the tracked settings file.
 
+#### statusline.sh
+
+`harnesses/claude/statusline.sh` draws the status line: model, git branch, and context usage, the last coloured by how close it is to full. The tracked `settings.json` points `statusLine` at `~/.claude/statusline.sh`, so symlink it there before running the settings script. Requires [`jq`](https://jqlang.github.io/jq/).
+
+```bash
+ln -s $(pwd)/harnesses/claude/statusline.sh ~/.claude/statusline.sh
+
+# to uninstall:
+# rm ~/.claude/statusline.sh
+```
+
 #### Extras
 
 Recommended plugins:
