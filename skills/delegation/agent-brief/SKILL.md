@@ -83,4 +83,4 @@ A caller supplies three things:
 
 Return the rendered markdown and nothing else. The caller owns the confirmation gate and the write.
 
-Current callers: [refine-issue](../refine-issue/SKILL.md) (issue thread + interview, gaps blocking) and [dispatch](../dispatch/SKILL.md) (session + branch state, gaps delegated).
+Current caller: [refine-issue](../refine-issue/SKILL.md) (issue thread + interview, gaps blocking).

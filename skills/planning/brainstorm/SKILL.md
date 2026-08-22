@@ -78,5 +78,5 @@ Every pass carries forward what's already settled. Never re-ask a resolved quest
 
 ## Notes
 
-- The chain this sits in: `brainstorm` shapes the idea, [refine](../refine/SKILL.md) resolves it, then [dispatch](../dispatch/SKILL.md) files it as an issue for an agent or [phase](../phase/SKILL.md) builds it now. Each step is the user's call, offered and never assumed.
+- The chain this sits in: `brainstorm` shapes the idea, [refine](../refine/SKILL.md) resolves it, then [phase](../phase/SKILL.md) builds it. Each step is the user’s call, offered and never assumed.
 - If the idea turns out to already exist in the codebase, say so and stop. That's the most valuable outcome this skill has.

@@ -16,7 +16,6 @@
   ],
   "skills": [
     "./skills/delegation/agent-brief",
-    "./skills/delegation/dispatch",
     "./skills/frontend/suggest-icon",
     "./skills/frontend/tailwind-v3-compat",
     "./skills/git/git-branch",
