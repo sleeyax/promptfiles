@@ -13,7 +13,7 @@ Pull the review feedback left on a pull request or merge request, decide what ac
 
 ## Hard rules
 
-- Every gate — target confirmation, dirty-tree, which comments to address, thread replies — is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer. Commits go through the `git-commit` skill's own gate.
+- Every gate — target confirmation, dirty-tree, which comments to address, thread replies — is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer. Committing is not one of these gates — the `git-commit` skill commits on its own.
 - **One commit per comment.** Group only when several comments demand the same edit; say so in the report when you do.
 - Never write back to GitHub/GitLab (pushes, replies, resolves) unless the user explicitly opts in at step 8. The default is local-only: commits stay on the machine and the user pushes manually.
 - Pushing is coupled to replying. Push **only** as part of a step 8 reply option, and only before posting — never as a standalone step, and never force-push.
@@ -99,7 +99,7 @@ For each chosen thread, in order:
 
 1. Make the edit. Keep it tight to what the comment asks — no drive-by refactors.
 2. Verify it's actually right (run the project's tests/linter for the touched area if that's cheap and the project has them).
-3. Invoke the [git-commit](../git-commit/SKILL.md) skill to commit just that fix. Its confirmation gate applies. The message should describe the change, and may reference the reviewer's point.
+3. Invoke the [git-commit](../git-commit/SKILL.md) skill to commit just that fix. The message should describe the change, and may reference the reviewer's point.
 4. Move to the next thread only once the current one is committed.
 
 Never batch several unrelated comments into one commit.

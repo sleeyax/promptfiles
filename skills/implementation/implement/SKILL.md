@@ -106,9 +106,7 @@ When done, summarize:
 
 ### 8. Commit
 
-Invoke the [git-commit](../git-commit/SKILL.md) skill to suggest a commit message and commit the changes.
-
-**Do not commit without explicit user confirmation.** This step is authorization to *propose* a commit and wait for the user's explicit choice — not standing authorization to commit.
+Invoke the [git-commit](../git-commit/SKILL.md) skill to commit the changes. It writes the message and commits on its own.
 
 ### 9. Review
 
@@ -116,5 +114,5 @@ Invoke the [review-changes](../review-changes/SKILL.md) skill to review the chan
 
 ## Notes
 
-- Every gate in this workflow — the Linear MCP retry/abort prompt, the branch choice, the commit confirmation — is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer.
+- Every gate in this workflow — the Linear MCP retry/abort prompt, the branch choice — is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer.
 - If the issue references other issues, PRs, discussions, or (on Linear) parent/sub-issues, fetch them too when they're load-bearing for the implementation.
