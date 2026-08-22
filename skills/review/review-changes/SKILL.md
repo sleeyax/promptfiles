@@ -1,35 +1,33 @@
 ---
 name: review-changes
-description: Review a branch's committed changes with two independent reviewers, then auto-commit only the trivial fixes. Use when the user explicitly asks to review a branch or self-review before pushing. Do not use just because code was written or edited, and do not use for reviewing a single file on request. For posting a GitLab MR review use review-mr instead.
+description: Review a branch's committed changes with two independent reviewers and report the merged findings. Use when the user explicitly asks to review a branch or self-review before pushing. Do not use just because code was written or edited, and do not use for reviewing a single file on request. For posting a GitLab MR review use review-mr instead.
 ---
 
 # Review Changes
 
 Scope: $ARGUMENTS
 
-Review a set of changes — the current branch's commits unless told otherwise — with a user-chosen reviewer, then fix the **simple, unambiguous** findings in their own commits so the branch lands in a ready-to-review state before it's pushed. Anything that needs human judgement is reported, not fixed.
+Review a set of changes — the current branch's commits unless told otherwise — with a user-chosen reviewer and report what they found. The skill is read-only end to end: it never edits, stages, or commits anything. Acting on the findings is the user's call.
 
-By default the review runs **two reviewers simultaneously** — Codex and Claude Code — because different models catch different things. Their reports are merged into one deduplicated verdict before triage.
+By default the review runs **two reviewers simultaneously** — Codex and Claude Code — because different models catch different things. Their reports are merged into one deduplicated verdict.
 
-The skill runs in whichever harness the user invoked it from (Claude Code, Codex, …) and offers the reviewers that harness can actually drive. Every reviewer is read-only — either an in-process subagent or a CLI subprocess. This skill's agent is the **only editor** — it triages the findings and applies the fixes itself.
+The skill runs in whichever harness the user invoked it from (Claude Code, Codex, …) and offers the reviewers that harness can actually drive. Every reviewer is read-only — either an in-process subagent or a CLI subprocess.
 
-It's also the reviewing engine other skills call instead of rolling their own — see [Report-only mode](#report-only-mode).
+It's also the reviewing engine other skills call instead of rolling their own — see [Called by another skill](#called-by-another-skill).
 
 ## Hard rules
 
-- The review step is read-only. Only this skill's agent edits files, and only after the step 7 apply gate.
+- Nothing here writes. Never edit, stage, commit, or push — not even a finding that looks trivially safe to fix. Report it and stop.
 - Reviewers run independently. Never feed one reviewer's findings to the other, and never let one wait on the other — the value is in two uncorrelated opinions.
-- Auto-fix **only** localized, unambiguous findings (see step 6). Report everything else for the human reviewer — never silently make architectural, security-sensitive, behaviour-changing, or judgement-call edits.
-- Every gate — reviewer choice, apply, dirty-tree, re-review — is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer. Commits go through the `git-commit` skill's own gate.
-- Never push. The user pushes manually.
+- The reviewer-choice gate is a real stop: ask, then wait for the answer. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer.
 - Don't dump the full diff into a prompt or hand it to the reviewer as one blob. Give the reviewer the base ref and let it run `git diff` / read files itself.
 - Never spawn a reviewer that can edit: an in-process subagent gets read-only tools, and a reviewer CLI is launched with its write tools denied. A reviewer that can't be constrained is not an option — pick another one.
 
-## Report-only mode
+## Called by another skill
 
-Another skill can call this one to do its reviewing — [review-mr](../review-mr/SKILL.md) does, to review a merge request's diff. Run steps 1–5 and hand the result back; **stop there**. No triage, no edits, no commits, no re-review gate, and no dirty-tree gate (nothing is being written).
+Another skill can call this one to do its reviewing — [review-mr](../review-mr/SKILL.md) does, to review a merge request's diff. Hand the merged findings back to the caller as a value instead of printing a summary for the user, and let it decide what to do with them.
 
-The caller passes `report-only` in `$ARGUMENTS` along with the scope, and gets back:
+Callers pass `report-only` in `$ARGUMENTS` along with the scope. It's a no-op — every run is read-only — but it's still accepted so existing callers keep working. Either way the caller gets back:
 
 - the merged, deduplicated findings in the shape below,
 - each reviewer's name + model and how it ran,
@@ -75,7 +73,7 @@ Every reviewer is asked for the same shape, so findings from two of them can be 
    - a commit range (`<a>...<b>`, `<a>..<b>`, or two SHAs) → use it as the scope verbatim, skipping the detection above.
    - `uncommitted` → review staged + unstaged + untracked changes instead.
    - `-- <path> …` → restrict the review to those paths.
-   - `report-only` → [report-only mode](#report-only-mode).
+   - `report-only` → hand the findings back to the caller, per [Called by another skill](#called-by-another-skill).
 6. If there's no diff in scope, report that there's nothing to review and stop.
 
 ### 2. Identify the current harness
@@ -141,48 +139,23 @@ If a reviewer fails (non-zero exit, missing or unauthenticated CLI), surface its
 
 ### 5. Merge the reports
 
-Skip this when only one reviewer ran. Otherwise fold both reports into a single verdict — the two will overlap, and the same bug reported twice must not become two findings, two fixes, or two commits.
+Skip this when only one reviewer ran. Otherwise fold both reports into a single verdict — the two will overlap, and the same bug reported twice must not become two findings.
 
 Two findings are the same when they describe the same defect in the same place: same file and same root cause, even if the line numbers drift, the severities disagree, or the wording is entirely different. Merge those into one entry — keep the clearer explanation and the more precise location, take the higher severity, and tag it with the reviewers that raised it.
 
 - Sort agreed findings first. Both reviewers landing on the same defect is the strongest signal in the report; say so.
 - A finding only one reviewer raised is not weaker evidence, just unconfirmed — these are often the most valuable ones. Verify it against the file yourself, and drop it only if verification shows it's plainly wrong, noting what you dropped and why.
 - Never merge two distinct defects because they share a file, and never merge a specific finding into a vaguer one that happens to overlap it.
-- When the two reviewers propose *contradictory* fixes for one defect, keep both proposals on the entry and treat it as complex/uncertain in step 6 unless one is obviously correct.
+- When the two reviewers propose *contradictory* fixes for one defect, keep both proposals on the entry and say they disagree.
 
-Print the merged list with a source tag per finding — `[both]`, `[codex]`, `[claude]` — and state the raw and merged counts (e.g. "14 findings from 2 reviewers → 9 unique, 5 agreed"). In report-only mode this list is the return value: hand it back and stop.
+Tag each merged finding with its sources — `[both]`, `[codex]`, `[claude]` — and keep the raw and merged counts (e.g. "14 findings from 2 reviewers → 9 unique, 5 agreed") for the report. When a caller invoked this skill, the merged list is the return value: hand it back and stop.
 
-### 6. Triage the findings
+### 6. Report
 
-Split every finding from the merged list into one of two buckets:
-
-- **Simple / safe (auto-fixable)** — one obvious correct fix, confined to lines/files already in the diff, with no behaviour/API/design change and no new dependency (e.g. null check, off-by-one, wrong variable, missing `await`, obvious resource leak, logic typo).
-- **Complex / uncertain (leave for the reviewer)** — architectural, security-sensitive, ambiguous, behaviour-changing, or otherwise a judgement call.
-
-Print a numbered list. For each finding show its bucket, location, and — for the simple ones — the proposed fix.
-
-### 7. Apply the fixes
-
-First, if the working tree is dirty, ask: **Stash** (restore after) / **Proceed anyway** / **Report only** — so per-finding fix commits stay clean.
-
-Then ask: **Apply proposed fixes** / **Pick a subset** / **Report only (no changes)**.
-
-On apply: edit only the chosen simple findings. Keep the change tight to each finding — no unrelated refactors — and confirm each fix is actually correct.
-
-### 8. Commit the fixes
-
-One commit per finding, grouped only when a few fixes clearly belong together. For each commit, invoke the [git-commit](../git-commit/SKILL.md) skill (its confirmation gate applies). These commits land **after** the existing branch commits.
-
-### 9. Offer a re-review
-
-Ask: **Re-review** (run another pass from step 3, to confirm the fixes are clean and catch anything new) / **Finish**.
-
-### 10. Report
-
-Summarize:
+Print the findings in severity order, then summarize:
 
 - The base branch the review ran against.
 - Each reviewer + model used, and how it ran (in-process subagent or CLI).
-- Counts: raw findings per reviewer / unique after merging / agreed by both / fixed / left for the reviewer.
-- The fix commit SHAs.
-- The list of complex/uncertain findings the human reviewer should still address.
+- Counts: raw findings per reviewer / unique after merging / agreed by both.
+
+Stop there. Don't offer to fix anything and don't start fixing — if the user wants the findings addressed, they'll ask.
