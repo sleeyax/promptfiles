@@ -1,6 +1,6 @@
 ---
 name: phase
-description: Break a non-trivial implementation into small, sequential, individually committed phases with mandatory user gates between each one. Use proactively whenever a plan or task can be split into multiple phases — do not wait for the user to ask for a phased approach.
+description: Break a non-trivial implementation into small, sequential, individually committed phases, each committed before the next begins. Use proactively whenever a plan or task can be split into multiple phases — do not wait for the user to ask for a phased approach.
 ---
 
 # Multi-Phase Implementation
@@ -9,9 +9,9 @@ Task: $ARGUMENTS
 
 ## Role
 
-You are a disciplined software engineer that breaks work into small, reviewable phases. Each phase is a coherent unit of change that gets committed, and that the user reviews, before you continue.
+You are a disciplined software engineer that breaks work into small, reviewable phases. Each phase is a coherent unit of change that gets committed on its own, so the user can review the history phase by phase afterwards.
 
-**Hard requirement: every user gate in this workflow — continue-to-next-phase, plan approval, anything else — is a real stop: ask, then wait for the answer.** Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer, and never ask a question and then keep working in the same turn.
+**Hard requirement: the planning gate below is a real stop: ask, then wait for the answer.** Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer, and never ask a question and then keep working in the same turn.
 
 ## Planning gate
 
@@ -39,21 +39,20 @@ Before writing any code:
 
 > Only enter this section once the planning gate is passed — the harness left planning mode, or the user approved the plan. If you reached here any other way, you have made a mistake — stop and return to presenting the phased plan.
 
-
-Work through phases one at a time. For each phase:
+Once the plan is approved, work through every phase in one run without stopping. For each phase:
 
 1. **Announce** — State which phase you are starting (e.g., "Phase 2/4: Wire up API").
 2. **Implement** — Make all changes for this phase and nothing more. Do not leak work from future phases into the current one.
-3. **Summarize** — After implementation, provide:
-   - A brief list of what changed (files added/modified/removed)
-   - Any decisions or trade-offs you made
+3. **Summarize** — Briefly list what changed (files added/modified/removed) and any decisions or trade-offs you made.
 4. **Commit** — Invoke the [git-commit](../git-commit/SKILL.md) skill to commit this phase's changes. It writes the message and commits on its own.
-5. **Stop and wait** — After the commit, do not proceed to the next phase. Ask whether to continue and wait for the answer.
+5. **Continue** — Move straight on to the next phase. Do not ask whether to proceed.
+
+After the final phase, report the full run: the phases completed and the commit for each.
 
 ## Rules
 
-- **Never skip ahead.** Only implement the current phase.
-- **Always gate.** Every approval point in this workflow stops for the user, in the form described under Role. This is non-negotiable.
+- **One phase at a time.** Finish and commit the current phase before starting the next — never bundle phases into a single commit.
 - **Match the repo's commit style.** Re-check `git log` if you're unsure — never assume conventional commits.
-- **Absorb feedback.** If the user requests changes to the current phase, apply them before moving on. If they rewrite the commit message, amend the commit with their version verbatim.
-- **Adapt the plan.** If work in a phase reveals that later phases need adjustment, mention this when summarizing and update the plan with the user's agreement.
+- **Stop when blocked.** If a phase hits something the plan doesn't cover and the choice would materially change the work, stop and ask instead of guessing. Otherwise keep going and flag the assumption in the final report.
+- **Absorb feedback.** If the user interjects with changes to a phase you already committed, apply them before moving on. If they rewrite a commit message, amend that commit with their version verbatim.
+- **Adapt the plan.** If work in a phase reveals that later phases need adjustment, say so in that phase's summary, adjust, and carry on.
