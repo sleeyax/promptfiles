@@ -41,6 +41,8 @@ The `skills` CLI does not handle output styles. Install those by symlinking `out
 - **Agents** live in `agents/` and are named `[name].md`, matching the kebab-case `name` frontmatter field
 - **Skills** live in `skills/<category>/<name>/SKILL.md` (one subdirectory per skill, grouped under a category folder, file always named `SKILL.md` — required for `npx skills` discovery). Skill frontmatter must include `name` and `description`.
   - Categories are `delegation`, `frontend`, `git`, `implementation`, `integrations`, `planning`, `review`, `setup`, and `utils`. They organise the repo only — skill names stay flat and globally unique, since the `skills` CLI installs them by `name`, not by path.
+  - A category may nest a further subdirectory when a group of skills shares a platform (`skills/integrations/openshift/query-db`). Nesting is invisible to the tooling as long as `plugin.json` lists the full path.
+  - A skill directory may carry an `agents/openai.yaml` with `policy.allow_implicit_invocation: false` — the Codex equivalent of `disable-model-invocation: true` in the frontmatter. Set both or neither.
   - `.claude-plugin/plugin.json` lists every skill path, so both `skills list` and Claude Code's plugin loader pick them up. The `skills` array is maintained manually — when adding, moving, or renaming a skill directory, update it too, or the skill won't load.
 - Agents use YAML frontmatter with fields: `name`, `description`, and optionally `tools` and `model`
 - `tools` is a comma-separated list of Claude Code tool names (e.g., `Read, Edit`); omit it to inherit all tools

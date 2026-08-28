@@ -22,6 +22,7 @@
     "./skills/git/git-commit",
     "./skills/implementation/implement",
     "./skills/integrations/granola-notes",
+    "./skills/integrations/openshift/oc-query-db",
     "./skills/planning/refine",
     "./skills/planning/refine-issue",
     "./skills/review/address-review",
