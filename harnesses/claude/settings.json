@@ -1,6 +1,5 @@
 {
   "attribution": {
-    "commit": "",
     "pr": ""
   },
   "permissions": {
@@ -33,7 +32,6 @@
     "context7@claude-plugins-official": true,
     "clangd-lsp@claude-plugins-official": true,
     "mattpocock-skills@mattpocock": true,
-    "superpowers@claude-plugins-official": false,
     "codex@openai-codex": true
   },
   "extraKnownMarketplaces": {
