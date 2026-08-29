@@ -23,7 +23,7 @@ npx skills update -g                        # pull the latest versions
 npx skills remove --global <name>... -y     # uninstall by skill name
 ```
 
-Install from `.`, not from `sleeyax/skills` — the latter pulls the published GitHub copy and silently ignores uncommitted local work.
+Install from `.`, not from `sleeyax/promptfiles` — the latter pulls the published GitHub copy and silently ignores uncommitted local work.
 
 `remove` and `add` are interactive by default, but the CLI detects it is running under an agent and falls back to a non-interactive run.
 Pass `-y` anyway so the command can't block.

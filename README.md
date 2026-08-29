@@ -1,6 +1,6 @@
-# skills
+# promptfiles
 
-My collection of skills for day-to-day agentic coding.
+My collection of skills, agents, output styles, and harness config for day-to-day agentic coding.
 
 > [!NOTE]
 > Everything in this repo is designed to fit **my** personal workflow and preferences. You're welcome to use it as-is or as inspiration for your own setup, but it evolves constantly and comes with no stable versioning guarantees. Anything in here may change or disappear without notice.
@@ -14,7 +14,7 @@ Pick one of two routes: the Claude Code plugin or the `skills` CLI (plus optiona
 This repo doubles as a Claude Code marketplace containing a single plugin, `sleeyax-skills`, that bundles every skill and both agents:
 
 ```bash
-claude plugin marketplace add sleeyax/skills
+claude plugin marketplace add sleeyax/promptfiles
 claude plugin install sleeyax-skills@sleeyax
 
 # update (no version is pinned, so every new commit counts as a new version)
@@ -26,7 +26,7 @@ claude plugin uninstall sleeyax-skills@sleeyax
 claude plugin marketplace remove sleeyax
 ```
 
-The same thing works in-session via `/plugin marketplace add sleeyax/skills` and `/plugin install sleeyax-skills@sleeyax`.
+The same thing works in-session via `/plugin marketplace add sleeyax/promptfiles` and `/plugin install sleeyax-skills@sleeyax`.
 
 To inspect what you got (component inventory and token cost): `claude plugin details sleeyax-skills`.
 
@@ -38,13 +38,13 @@ Install via the [`skills`](https://www.npmjs.com/package/skills) CLI:
 
 ```bash
 # install
-npx skills add sleeyax/skills
+npx skills add sleeyax/promptfiles
 
 # update
 npx skills update
 
 # uninstall
-npx skills remove sleeyax/skills
+npx skills remove sleeyax/promptfiles
 ```
 
 #### Local development
