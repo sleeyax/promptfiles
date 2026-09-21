@@ -90,7 +90,7 @@ If both the MCP server and the CLI are unavailable, stop and tell the user what 
 
 If a `CONTEXT.md` or `CONTEXT-MAP.md` exists, read it before planning — it's the project's glossary, and the issue may well be written in its terms.
 
-Produce a plan whose shape fits the issue — let the work drive the structure rather than a fixed template. If the issue is unclear or missing key details, invoke the [refine-issue](../refine-issue/SKILL.md) skill to spec it out properly before finalizing the plan.
+Produce a plan whose shape fits the issue — let the work drive the structure rather than a fixed template. If the issue is unclear or missing key details, invoke the [refine](../../planning/refine/SKILL.md) skill to spec it out properly before finalizing the plan.
 
 ### 6. Implement
 
