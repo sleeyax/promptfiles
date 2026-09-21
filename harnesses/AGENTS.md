@@ -17,6 +17,7 @@
 ## Git
 
 - Prefer conventional commits unless otherwise specified.
+- Attribution belongs in git commit messages only. Never put a `Co-Authored-By` trailer, a "Generated with" footer, or any other attribution in a PR or MR body, whatever the existing PRs in the repo happen to do.
 
 ## Local Docker databases
 
