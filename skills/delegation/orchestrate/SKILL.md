@@ -29,7 +29,7 @@ A worker has no one to ask, so every brief carries these:
 
 Establish, delegating to read-only subagents where the sweep fans out:
 
-- **Conventions** — the repo's own docs, and which installed skills cover this repo's work: implementing an item, reviewing a branch, committing, filing or refining an issue. Items are executed and issues filed through those where they exist; a plain implement → self-review → draft PR/MR pass is the fallback.
+- **Conventions** — the repo's own docs, and the skills covering this repo's work, looked up by name: `file-issue`, `implement`, `review-changes`, `publish-mr`, `git-commit`, `refine-scope`, `to-spec`. Resolve against the skills this session actually lists, never against a constructed `<org>-skills:<name>`. Where a name resolves to several, prefer the one whose namespace matches the repo's org; else the unnamespaced one. Where it resolves to none, the fallback is a plain implement → self-review → draft PR/MR pass — attended, ask before falling back; AFK, fall back and note it in the report.
 - **The tracker** — GitHub, GitLab or Linear, from the plan source or the origin remote.
 - **The plan source** — an epic, a milestone, a roadmap issue, or just the open issues, preferred in that order; $ARGUMENTS wins when it names one.
 - **In-flight work** — open PRs/MRs, assigned issues, claim markers. Anything already claimed, by anyone, is off the plan.
