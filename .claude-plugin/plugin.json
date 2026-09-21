@@ -19,7 +19,6 @@
     "./skills/frontend/tailwind-v3-compat",
     "./skills/git/git-branch",
     "./skills/git/git-commit",
-    "./skills/implementation/implement",
     "./skills/integrations/granola-notes",
     "./skills/integrations/openshift/oc-query-db",
     "./skills/planning/refine",
