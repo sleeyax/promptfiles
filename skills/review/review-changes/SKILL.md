@@ -110,7 +110,13 @@ Drop any option whose CLI is missing, and say why it's missing. If only **Skip**
 
 Route by the choice. Give every reviewer the quality bar below, plus the base ref (`<base>...HEAD`) or the uncommitted scope — never the diff itself.
 
-- **Codex CLI** → `codex review --base <base> "<quality bar + finding shape>"` (or `codex review --uncommitted "…"` for the uncommitted scope). The quality bar goes in `codex review`'s positional `[PROMPT]` argument — there is no flag for it. Select a model with `-c model="<model>"`; `codex review` has no `-m`/`--model`. Capture stdout as the findings report. Same command whichever harness you're in.
+- **Codex CLI** → prompt-only, with reasoning effort set explicitly:
+
+  ```sh
+  codex review -c 'model_reasoning_effort="high"' "<review prompt: exact scope as git commands + quality bar + finding shape>"
+  ```
+
+  Codex CLI versions through at least 0.156.1 make *every* scope flag (`--base`, `--uncommitted`, `--commit`) mutually exclusive with the positional `[PROMPT]`, and the prompt is the only carrier of the quality bar and finding shape — so never use a scope flag. Name the exact scope inside the prompt as the git commands Codex must run itself: start with `git diff --stat <base>...HEAD`, then `git diff <base>...HEAD -- <paths>` hunk by hunk reading the surrounding files (for the uncommitted scope: `git diff --cached`, `git diff`, and `git ls-files --others --exclude-standard`), and report nothing outside them. The prompt form is also strictly more expressive than the flags — it can ask for committed *plus* uncommitted in one review, which no flag combination can. Always pass `-c 'model_reasoning_effort="high"'` unless the user named an effort: `codex review`'s configured default can be `none`, which on a measured branch was the difference between 0 findings and 4, including a real cross-file blocker. Select a model with `-c 'model="<model>"'`; `codex review` has no `-m`/`--model`. Capture stdout as the findings report. Same command whichever harness you're in.
 - **Claude Code, in-process** (Claude Code only) → spawn a subagent (Agent tool) constrained to read-only tools (read / search / read-only git like `git diff`, `git log`, `git show`; no edit/write), with the model override if one was named. Prompt it with the base ref + the quality bar and have it return a findings report.
 - **Claude Code, CLI** (from Codex or another harness) → one non-interactive run with write tools withheld:
 
@@ -127,13 +133,13 @@ Route by the choice. Give every reviewer the quality bar below, plus the base re
 
     ```sh
     out_codex=$(mktemp); out_claude=$(mktemp)
-    codex review --base <base> "<quality bar + finding shape>" >"$out_codex" 2>&1 &
+    codex review -c 'model_reasoning_effort="high"' "<review prompt>" >"$out_codex" 2>&1 &
     claude -p --allowed-tools "..." --disallowed-tools "..." "<review prompt>" >"$out_claude" 2>&1 &
     wait
     ```
-- **Other** → parse the input: `claude` / `claude code` family → the Claude Code route for the current harness with that model; `codex` family → `codex review -c model="<model>" --base <base> "<quality bar + finding shape>"`. An unrecognized harness → ask the user for the exact non-interactive, read-only review command to run.
+- **Other** → parse the input: `claude` / `claude code` family → the Claude Code route for the current harness with that model; `codex` family → the prompt-only Codex route above with `-c 'model="<model>"'`, and the user's named reasoning effort in place of `high` if they gave one. An unrecognized harness → ask the user for the exact non-interactive, read-only review command to run.
 
-If a reviewer fails (non-zero exit, missing or unauthenticated CLI), surface its stderr and suggest the likely fix (e.g. `codex login`, `claude login`). With **Both**, keep going on the surviving reviewer's report and say the review is single-sourced; if it was the only reviewer, offer to pick a different one. Do not silently fall back to reviewing inline.
+If a reviewer fails (non-zero exit, missing or unauthenticated CLI), surface its stderr and suggest the likely fix (e.g. `codex login`, `claude login`). With **Both**, keep going on the surviving reviewer's report and say the review is single-sourced; if it was the only reviewer, offer to pick a different one. Do not silently fall back to reviewing inline, and never retry a failed `codex review` by swapping in a scope flag and dropping the prompt — that discards the quality bar and finding shape, so the two reviewers stop answering the same question and the merge step's agreement signal goes meaningless.
 
 **Quality bar:** concrete bugs, correctness issues, security problems, and maintainability risks *introduced by these changes* — cite file + line, verify against the actual files, no speculation. Nits and style are in scope, at `nit` severity. Every reviewer returns its findings in the [finding shape](#finding-shape).
 
