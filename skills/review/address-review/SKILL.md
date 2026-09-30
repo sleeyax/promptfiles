@@ -134,11 +134,17 @@ Post and resolve via the MCP server, or:
 
 ### 8. Report
 
-Summarize:
+The report is the user's audit trail of every decision made on their behalf, so it covers every triaged thread, whatever its outcome.
 
-- PR/MR title + URL.
-- Counts per bucket, and how many commits were made.
-- Commit SHA per addressed comment.
-- Each declined thread with its one-line reason, so the user can overrule it.
-- Whether the branch was pushed, and any thread that couldn't be replied to or resolved, with the error.
-- Whether a stash was restored, or left in place after a conflicting pop.
+Open with the PR/MR title + URL, counts per bucket, and how many commits were made and whether they were pushed.
+
+Then one table row per thread, numbered as in triage:
+
+| # | Bucket | Author · location | Ask | Decision | Replied | Resolved |
+| --- | --- | --- | --- | --- | --- | --- |
+
+- **Author · location** — the reviewer and `path:line`, linked to the thread.
+- **Decision** — the change and its commit SHA (**Address**), the SHA that already handled it (**Already fixed**), the gist of the answer (**Reply only**), or the reasoning (**Decline**). Mark threads the user settled in step 5.
+- **Replied** / **Resolved** — ✅, or ❌ with the error.
+
+Close with whether a stash was restored, or left in place after a conflicting pop.
