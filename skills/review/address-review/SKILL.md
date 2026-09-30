@@ -1,22 +1,22 @@
 ---
 name: address-review
-description: Fetch a GitHub PR's or GitLab MR's review comments, triage them, address the relevant ones with one commit per comment, then push, reply to and resolve every thread. Defaults to the open PR/MR for the current branch. Use when the user wants to act on reviewer feedback left on a PR/MR.
+description: Fetch a GitHub PR's or GitLab MR's review comments, triage them, address the relevant ones with one local commit per comment, then, once the user signs off on the report, push, reply to and resolve every thread. Defaults to the open PR/MR for the current branch. Use when the user wants to act on reviewer feedback left on a PR/MR.
 ---
 
 # Address Review Comments
 
 PR/MR (optional): $ARGUMENTS
 
-Pull the review feedback left on a pull request or merge request, decide what actually needs changing, land each addressed comment as its own commit, then push and close the loop on every thread: a reply, then a resolve.
+Pull the review feedback left on a pull request or merge request, decide what actually needs changing, land each addressed comment as its own local commit, and once the user signs off, push and close the loop on every thread: a reply, then a resolve.
 
 `$ARGUMENTS` is **optional** — with no argument, the target is the open PR/MR for the current branch. Example invocations: `/address-review`, `/address-review 42`, `/address-review <mr-url>`.
 
 ## Hard rules
 
-- Run **autonomously**. Your triage is the decision: fix what you judge should be fixed, decline what you judge shouldn't, push, reply and resolve — all without asking.
-- Ask the user only for what you genuinely can't decide — the **Needs the user** bucket and the few blocking cases named in the workflow. Batch those questions into one ask, and ask before touching code so everything after runs unattended. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with numbered options and stop until the user replies.
+- Run **autonomously** up to one **sign-off** (step 7). Your triage is the decision: fix what you judge should be fixed and decline what you judge shouldn't, all locally and without asking. Nothing leaves the machine until the user signs off on the report.
+- Ask the user only for what you genuinely can't decide — the **Needs the user** bucket and the few blocking cases named in the workflow. Batch those questions into one ask, and ask before touching code so the run is unattended up to sign-off. Use the `AskUserQuestion` tool **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with numbered options and stop until the user replies.
 - **One commit per comment.** Group only when several comments demand the same edit; say so in the report when you do.
-- Push with a plain `git push` only. On a rejected push, stop: report it and post nothing, since replies cite SHAs the reviewer can't fetch yet.
+- Push with a plain `git push` only, and only after sign-off. On a rejected push, stop: report it and post nothing, since replies cite SHAs the reviewer can't fetch yet.
 - Judge each comment on its merits. A reviewer can be wrong or working from stale context — decline those with a reasoned reply.
 - Read the files the comments point at, not the full diff.
 
@@ -100,6 +100,8 @@ If any thread is **Needs the user**, ask about all of them in one batch now, the
 
 ### 6. Fix and commit, one comment at a time
 
+Record `git rev-parse HEAD` as the **base**: everything after it is this run's local history, free to rewrite until step 8 pushes it.
+
 For each **Address** thread, in order:
 
 1. Make the edit, scoped to what the comment asks.
@@ -109,14 +111,22 @@ For each **Address** thread, in order:
 
 If a fix turns out wrong or infeasible once you're in the code, revert it and move the thread to **Decline** with the reason you found.
 
-### 7. Push, reply and resolve
+### 7. Sign-off
+
+Show the [report](#report) without the **Replied** / **Resolved** columns, then ask: **Continue** (push, reply and resolve) / **Request changes**.
+
+On **Request changes**, apply what the user asks and keep the history at one clean commit per comment:
+
+- Rework a fix: commit with `git commit --fixup=<sha>`, then `GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash <base>`.
+- Drop a fix (e.g. the thread moves to **Decline**): `git rebase --onto <sha>^ <sha>`.
+- Change a bucket or an explanation: update the report.
+
+Then show the report again and ask again, until the user picks **Continue**.
+
+### 8. Push, reply and resolve
 
 1. If step 6 made commits, `git push` (`--set-upstream origin <branch>` if it has no upstream).
-2. Reply to every thread from triage, then resolve it:
-   - **Address** — what changed, with the commit SHA.
-   - **Already fixed** — the commit SHA that handled it.
-   - **Reply only** — the answer.
-   - **Decline** — the reasoning, stated plainly and specifically.
+2. Reply to every thread with its **Explanation** from the signed-off report, citing the commit SHA where there is one, then resolve it.
 
 Post and resolve via the MCP server, or:
 
@@ -132,7 +142,9 @@ Post and resolve via the MCP server, or:
   Review bodies and general PR comments aren't threads: answer them in one `gh pr comment <number>` that quotes each point it responds to. There's nothing to resolve.
 - **GitLab**: `glab api -X POST "projects/<path>/merge_requests/<iid>/discussions/<id>/notes" -f body=<reply>`, then `glab api -X PUT "projects/<path>/merge_requests/<iid>/discussions/<id>" -f resolved=true`.
 
-### 8. Report
+Finish by showing the full report.
+
+## Report
 
 The report is the user's audit trail of every decision made on their behalf, so it covers every triaged thread, whatever its outcome.
 
@@ -146,7 +158,7 @@ Then one table row per thread, numbered as in triage:
 - **Thread** — `path:line` (or "general" for a non-inline comment), linked to the thread.
 - **Bucket** — mark threads the user settled in step 5.
 - **Commit** — the SHA that addresses it (**Address**, **Already fixed**); `—` otherwise.
-- **Explanation** — what changed and why (**Address**), how the earlier commit covers it (**Already fixed**), the gist of the answer (**Reply only**), or the reasoning (**Decline**).
+- **Explanation** — the reply text: what changed and why (**Address**), how the earlier commit covers it (**Already fixed**), the answer (**Reply only**), or the reasoning (**Decline**).
 - **Replied** / **Resolved** — ✅; `—` where it doesn't apply (general comments can't be resolved); or ❌ with the cause: skipped because the push was rejected, or the error message `gh`/`glab` or the MCP server returned.
 
 Close with whether a stash was restored, or left in place after a conflicting pop.
