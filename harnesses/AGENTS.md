@@ -30,3 +30,8 @@
 ## Memory
 
 - Never write to memory unprompted. When something seems worth persisting, ask first whether to: write to project CLAUDE.md, write to global CLAUDE.md, save to memory, or skip it.
+
+## Issue trackers
+
+- When work belongs to an issue on any tracker (GitHub, GitLab, Linear, ...) that has task-list checkboxes, tick each box once the work satisfying it is pushed, through whichever CLI or MCP tool reaches that tracker.
+- Tick only boxes the pushed work fully covers, and change only the checkbox markers so the rest of the issue body stays byte-identical.
