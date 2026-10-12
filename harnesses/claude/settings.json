@@ -14,7 +14,8 @@
       "PushNotification",
       "RemoteTrigger",
       "ReportFindings",
-      "ScheduleWakeup"
+      "ScheduleWakeup",
+      "Skill(mattpocock-skills:pr)"
     ],
     "defaultMode": "auto"
   },
