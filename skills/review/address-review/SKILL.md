@@ -55,17 +55,26 @@ Bail early if the PR/MR is `closed` or `merged`, unless the user confirms they s
 
 Prefer the provider's MCP server if one is available in the session; otherwise use the CLI:
 
-- **GitHub**: `gh pr view <number> --json title,url,reviews,comments` for review bodies and general discussion, plus `gh api repos/<owner>/<repo>/pulls/<number>/comments --paginate` for inline review comments (each carries `path`, `line`, `diff_hunk`, `in_reply_to_id`, `body`, `user.login`).
-- **GitLab**: `glab api "projects/<urlencoded-path>/merge_requests/<iid>/discussions" --paginate` — each discussion has `notes[]` with `position` (path + `new_line`), `resolved`, `system`, and `body`.
+- **GitHub**: inline review threads come from GraphQL, since the REST comments endpoint carries neither `isResolved` nor the thread `id` that replying and resolving need:
+
+  ```bash
+  gh api graphql -F owner=<owner> -F repo=<repo> -F n=<number> -f query='
+    query($owner:String!,$repo:String!,$n:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$n){
+      reviewThreads(first:100){nodes{id isResolved isOutdated path line
+        comments(first:50){nodes{author{login} body}}}}}}}'
+  ```
+
+  Add `gh pr view <number> --json reviews,comments` for review bodies and general discussion.
+- **GitLab**: `glab api "projects/<urlencoded-path>/merge_requests/<iid>/discussions" --paginate` — each discussion has an `id` and `notes[]` with `position` (path + `new_line`), `resolved`, `system`, and `body`.
 
 If neither MCP nor CLI is available, stop and tell the user what to install.
 
-Normalize into one list of threads, each with: author, path + line (if inline), the comment body, any replies, and resolved state.
+Normalize into one list of threads, each with: thread id, author, path + line (if inline), the comment body, any replies, and resolved state.
 
 Filter out:
 - system/activity notes (GitLab `system: true`, GitHub timeline events)
 - threads already marked resolved
-- your own prior replies
+- threads whose last word is already your own reply
 
 Keep bot comments (linters, CI, review bots) but mark them as such — they're often the easy wins.
 
@@ -118,7 +127,21 @@ Either posting option implies pushing — a reply that cites a SHA the reviewer 
 
 1. Push the branch: `git push` (`--set-upstream origin <branch>` if it has no upstream). Never force-push; if the push is rejected as non-fast-forward, stop, report it, and leave the replies unposted — the user resolves the divergence.
 2. Show the exact reply text for each thread and confirm the batch.
-3. Post, then resolve if that option was chosen. Only threads in the **Address** / **Already fixed** buckets get a reply — never auto-reply to a disagreement on the user's behalf. Post via the MCP server or `gh api ... /comments/<id>/replies` / `glab api ... /discussions/<id>/notes`.
+3. Post, then resolve if that option was chosen. Only threads in the **Address** / **Already fixed** buckets get a reply — never auto-reply to a disagreement on the user's behalf.
+
+Post and resolve via the MCP server, or:
+
+- **GitHub** review threads:
+
+  ```bash
+  gh api graphql -F id=<thread-id> -F body=<reply> -f query='
+    mutation($id:ID!,$body:String!){addPullRequestReviewThreadReply(input:{pullRequestReviewThreadId:$id,body:$body}){comment{url}}}'
+  gh api graphql -F id=<thread-id> -f query='
+    mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}'
+  ```
+
+  Review bodies and general PR comments aren't threads: answer them in one `gh pr comment <number>` that quotes each point it responds to. There's nothing to resolve.
+- **GitLab**: `glab api -X POST "projects/<path>/merge_requests/<iid>/discussions/<id>/notes" -f body=<reply>`, then `glab api -X PUT "projects/<path>/merge_requests/<iid>/discussions/<id>" -f resolved=true`.
 
 ### 9. Report
 
