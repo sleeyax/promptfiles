@@ -27,6 +27,10 @@
 
 - At the end of each plan, give me a list of unresolved questions to answer, if any. Make the questions extremely concise. Sacrifice grammar for the sake of concision.
 
+## Grilling
+
+- When you ask me numbered questions with recommended answers (grill-me, grilling, or any similar interview round), any question I don't answer means I accept your recommendation. List the ones you took as accepted in one line and move on.
+
 ## Memory
 
 - Never write to memory unprompted. When something seems worth persisting, ask first whether to: write to project CLAUDE.md, write to global CLAUDE.md, save to memory, or skip it.
