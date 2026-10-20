@@ -99,7 +99,7 @@ For each chosen thread, in order:
 
 1. Make the edit. Keep it tight to what the comment asks — no drive-by refactors.
 2. Verify it's actually right (run the project's tests/linter for the touched area if that's cheap and the project has them).
-3. Invoke the [git-commit](../git-commit/SKILL.md) skill to commit just that fix. The message should describe the change, and may reference the reviewer's point.
+3. Invoke the [git-commit](../../git/git-commit/SKILL.md) skill to commit just that fix. The message should describe the change, and may reference the reviewer's point.
 4. Move to the next thread only once the current one is committed.
 
 Never batch several unrelated comments into one commit.
