@@ -13,7 +13,7 @@ Pull the review feedback left on a pull request or merge request, propose what t
 
 ## Hard rules
 
-- **Nothing is edited, committed, pushed or posted until the plan (step 5) is agreed.** Show it, then wait. The plan is always plain text, since the user answers it per comment.
+- **Nothing is edited, committed, pushed or posted until the plan (step 5) is agreed.** Show it, then wait. The plan is always plain text, since the user answers it per comment. Once agreed, it covers every edit, commit, push, reply and resolve in it: run through to the report without asking again.
 - The other stops — an unresolvable or closed target, a dirty tree — are real stops too: ask, then wait. Use the `AskUserQuestion` tool for those **when it's available in the session**; where it isn't (e.g. Codex), ask in plain text with the same numbered options and stop until the user replies. Never assume an answer. Committing is not a stop — the `git-commit` skill commits on its own.
 - **One commit per comment.** Group only when several comments demand the same edit; say so in the report when you do.
 - **Every thread gets a reply**, exactly as agreed in the plan. Push only right before posting, since replies cite SHAs the reviewer must be able to fetch, and never force-push.
@@ -139,7 +139,7 @@ For each **Address** thread, in order:
 
 Never batch several unrelated comments into one commit.
 
-If a fix can't be made as agreed once you're in the code, revert the edit and bring that comment back as a new round of the plan. Don't push until it's agreed again.
+If a fix can't be made as agreed once you're in the code, or its reply needs more than the SHA filled in, revert the edit and bring that comment back as a new round of the plan. Don't push until it's agreed again.
 
 ### 8. Push, reply and resolve
 
