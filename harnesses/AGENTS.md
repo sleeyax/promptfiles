@@ -23,6 +23,15 @@
 
 - When working with a database running in a local Docker container, prefer the tooling inside the container (via `docker [compose] exec`) to inspect or modify data. Only fall back to host tooling when the required tool is not available inside the container.
 
+## Demo videos
+
+- Record web app demos with a Playwright script using `recordVideo`. The Claude in Chrome GIF recorder grabs one frame per action, caps at 50 and stamps action labels, so its result plays like a slideshow.
+- Keep the script in a scratch directory outside the repo and load Playwright from the project's `node_modules` with `createRequire`.
+- Playwright videos show no mouse: inject a cursor through `addInitScript` that follows `mousemove` and pulses on `mousedown`, glide to each target with `page.mouse.move(x, y, { steps })`, and type with a per-key delay so viewers can follow along.
+- Date and time inputs take their format from the browser's UI language, not the context `locale`, and Playwright's bundled Chromium ignores it. For local formats, launch the system Chrome or Chromium through `executablePath` with `--lang=<locale>` and the `LANGUAGE` env var.
+- Hide dev overlays such as framework dev toolbars, turn off spellcheck squiggles, and scroll only when the target is out of view so sticky bars don't make the page jump.
+- Reset the app's data before each take, trim the video to start once the page is ready, encode it as H.264 MP4 (`yuv420p`, `+faststart`), and check an ffmpeg contact sheet of its frames before handing it over.
+
 ## Plans
 
 - At the end of each plan, give me a list of unresolved questions to answer, if any. Make the questions extremely concise. Sacrifice grammar for the sake of concision.
