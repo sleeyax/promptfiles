@@ -14,7 +14,8 @@
       "PushNotification",
       "RemoteTrigger",
       "ReportFindings",
-      "ScheduleWakeup"
+      "ScheduleWakeup",
+      "Skill(mattpocock-skills:pr)"
     ],
     "defaultMode": "auto"
   },
@@ -51,6 +52,7 @@
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "awaySummaryEnabled": false,
+  "idleCompaction": false,
   "showClearContextOnPlanAccept": true,
   "tui": "fullscreen",
   "autoMemoryEnabled": false,
