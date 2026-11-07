@@ -17,7 +17,8 @@
 ## Git
 
 - Prefer conventional commits unless otherwise specified.
-- Never delete local or remote branches, even merged ones, and never ask or offer to.
+- Don't delete local or remote branches yourself, even merged ones, and don't ask or offer to.
+  This covers only your own actions: it says nothing about how the repo or its host handles branches on merge, so don't draw conclusions about that from it.
 - Attribution belongs in git commit messages only. Never put a `Co-Authored-By` trailer, a "Generated with" footer, or any other attribution in a PR or MR body, whatever the existing PRs in the repo happen to do.
 
 ## Local Docker databases
