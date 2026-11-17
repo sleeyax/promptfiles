@@ -3,6 +3,7 @@
 ## Scope
 
 - Don't make changes if I am just asking questions. Answer, and let me decide what to do about it.
+- Never create files or directories in my home directory unless I ask for it, apart from changes inside the project you're working on.
 
 ## Comments & commit messages
 
