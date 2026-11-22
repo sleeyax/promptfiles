@@ -1,6 +1,7 @@
 ---
 name: address-review
 description: Fetch a GitHub PR's or GitLab MR's review comments and lay out a plan per comment — the fix, the reply, and whether to resolve — that the user accepts with "ok" or discusses comment by comment. Then commit one fix per comment, push, reply to every thread and resolve the settled ones. Defaults to the open PR/MR for the current branch. Use when the user wants to act on reviewer feedback left on a PR/MR.
+disable-model-invocation: true
 ---
 
 # Address Review Comments
