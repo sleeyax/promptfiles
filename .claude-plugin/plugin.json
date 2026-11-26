@@ -16,6 +16,7 @@
   ],
   "skills": [
     "./skills/delegation/paseo-implement-tickets",
+    "./skills/frontend/record-demo",
     "./skills/frontend/suggest-icon",
     "./skills/frontend/tailwind-v3-compat",
     "./skills/git/git-branch",
