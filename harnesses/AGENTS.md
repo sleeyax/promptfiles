@@ -35,10 +35,6 @@
 - Hide dev overlays such as framework dev toolbars, turn off spellcheck squiggles, and scroll only when the target is out of view so sticky bars don't make the page jump.
 - Trim the video to start once the page is ready, encode it as H.264 MP4 (`yuv420p`, `+faststart`), and check an ffmpeg contact sheet of its frames before handing it over.
 
-## Plans
-
-- At the end of each plan, give me a list of unresolved questions to answer, if any. Make the questions extremely concise. Sacrifice grammar for the sake of concision.
-
 ## Memory
 
 - Never write to memory unprompted. When something seems worth persisting, ask first whether to: write to project CLAUDE.md, write to global CLAUDE.md, save to memory, or skip it.
